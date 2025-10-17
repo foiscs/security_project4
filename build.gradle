@@ -6,11 +6,10 @@ plugins {
 
 group = 'hyundai-4th'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17) //JDK:17
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
@@ -19,17 +18,9 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.apache.tomcat.embed:tomcat-embed-core:9.0.62'
-	implementation 'org.apache.tomcat.embed:tomcat-embed-el:9.0.62'
-	implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:9.0.62'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework:spring-framework-bom:5.2.19.RELEASE"
-	}
 }
 
 tasks.named('test') {
