@@ -67,4 +67,16 @@ variable "common_tags" {
 variable "vpc_id"               { type = string }
 variable "public_subnet_ids"    { type = list(string) }
 variable "private_subnet_ids"   { type = list(string) }
-variable "ami_id"               { type = string }
+# variable "ami_id"               { type = string }
+
+
+variable "web_ami_id" {
+  description = "AMI ID for web instances (ASG)"
+  type        = string
+}
+
+variable "bastion_ami_id" {
+  description = "AMI ID for bastion host (optional)"
+  type        = string
+  default     = null
+}

@@ -3,7 +3,7 @@
 # Launch Template for web ASG
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
-  image_id      = var.ami_id
+  image_id      = var.web_ami_id
   instance_type = "t3.micro"
   vpc_security_group_ids = [aws_security_group.web.id]
   tag_specifications {
@@ -124,13 +124,16 @@ resource "aws_security_group" "bastion" {
 
 # RDS 연결용 bastion host
 resource "aws_instance" "bastion" {
-  ami                    = var.ami_id
+  ami                    = coalesce(var.bastion_ami_id, data.aws_ssm_parameter.al2023.value)
   instance_type          = "t3.micro"
   subnet_id              = element(var.public_subnet_ids, 0)
   vpc_security_group_ids = [aws_security_group.bastion.id]
   tags = merge(var.common_tags, { Name = "${var.project_name}-bastion" })
 }
 
+data "aws_ssm_parameter" "al2023" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+}
 
 
 resource "aws_security_group" "web" {

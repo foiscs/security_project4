@@ -940,3 +940,10 @@ variable "application_port" {
   type        = number
   default     = 8080
 }
+
+
+# 소스 AMI ID 입력
+variable "source_ami_id_use1" {
+  type = string
+  default = "ami-03b0345dae9dfe6eb"
+}
