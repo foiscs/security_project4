@@ -10,6 +10,7 @@ data "aws_ami" "web" {
 }
 
 
+
 # =========================================
 # EC2 Module - ALB, ASG, TG, EC2
 # =========================================
@@ -22,10 +23,11 @@ module "ec2"{
   allowed_ssh_cidrs   = var.allowed_ssh_cidrs
   enable_load_balancer= true
   lb_type             = var.lb_type
-  vpc_id             = module.vpc.vpc_id
-  public_subnet_ids  = module.vpc.public_subnet_ids
-  private_subnet_ids = module.vpc.private_subnet_ids
-  ami_id             = data.aws_ami.web.id
+  vpc_id              = module.vpc.vpc_id
+  public_subnet_ids   = module.vpc.public_subnet_ids
+  private_subnet_ids  = module.vpc.private_subnet_ids
+  # ami_id            = data.aws_ami.web.id
+  web_ami_id          = aws_ami_copy.web_copy_to_seoul.id
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
@@ -225,17 +227,32 @@ resource "aws_cloudwatch_log_group" "security_logs" {
 # =========================================
 
 
-module "ecr" {
-  source = "./modules/ecr"
-  name = "myapp"
-  tags = {
-    Environment = "dev"
-    Project     = "myproject"
-  }
+# module "ecr" {
+#   source = "./modules/ecr"
+#   name = "myapp"
+#   tags = {
+#     Environment = "dev"
+#     Project     = "myproject"
+#   }
+# }
+
+
+# =========================================
+# Local Values (공통 설정)
+# =========================================
+
+# us-east-1 → ap-northeast-2로 복사
+resource "aws_ami_copy" "web_copy_to_seoul" {
+  name          = "web-base-seoul-${var.project_name}-${formatdate("YYYYMMDD-hhmmss", timestamp())}"
+  description   = "Copied from ${var.source_ami_id_use1} (us-east-1) to ap-northeast-2"
+  source_ami_id = var.source_ami_id_use1
+  source_ami_region = "us-east-1"
+
+  # 소스 스냅샷이 암호화되어 있다면 아래 두 줄 활성화 + 서울 KMS 키 지정
+  # encrypted  = true
+  # kms_key_id = aws_kms_key.main.arn
+
+  tags = merge(var.common_tags, {
+    Role = "web-base"
+  })
 }
-
-
-
-
-
-
