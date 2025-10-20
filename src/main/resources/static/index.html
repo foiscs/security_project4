@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Service User API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h2 { color: #0066cc; }
+        input, button, textarea { margin: 5px; padding: 8px; }
+        textarea { width: 500px; height: 120px; display: block; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<h2>🚗 User API Test Console</h2>
+
+<div>
+    <h3>회원가입</h3>
+    <input id="email" placeholder="email@example.com">
+    <input id="password" placeholder="password">
+    <input id="name" placeholder="name">
+    <input id="phone" placeholder="phone">
+    <button onclick="createUser()">등록</button>
+</div>
+
+<div>
+    <h3>조회</h3>
+    <input id="userId" placeholder="user_id (UUID)">
+    <button onclick="getById()">ID로 조회</button>
+    <br>
+    <input id="searchEmail" placeholder="email@example.com">
+    <button onclick="getByEmail()">이메일로 조회</button>
+</div>
+
+<div>
+    <h3>부분 수정</h3>
+    <input id="patchId" placeholder="user_id (UUID)">
+    <input id="patchPhone" placeholder="새 phone">
+    <input id="patchStatus" placeholder="새 status">
+    <button onclick="updateUser()">수정</button>
+</div>
+
+<h3>응답 결과</h3>
+<pre id="result">...</pre>
+
+<script>
+    const BASE = "http://localhost:8080/api/v1/users";
+
+    async function createUser() {
+      const body = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value
+      };
+      const res = await fetch(BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      document.getElementById("result").textContent = await res.text();
+    }
+
+    async function getById() {
+      const id = document.getElementById("userId").value;
+      const res = await fetch(`${BASE}/${id}`);
+      document.getElementById("result").textContent = await res.text();
+    }
+
+    async function getByEmail() {
+      const email = document.getElementById("searchEmail").value;
+      const res = await fetch(`${BASE}?email=${email}`);
+      document.getElementById("result").textContent = await res.text();
+    }
+
+    async function updateUser() {
+      const id = document.getElementById("patchId").value;
+      const body = {
+        phone: document.getElementById("patchPhone").value,
+        status: document.getElementById("patchStatus").value
+      };
+      const res = await fetch(`${BASE}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      document.getElementById("result").textContent = await res.text();
+    }
+</script>
+</body>
+</html>
