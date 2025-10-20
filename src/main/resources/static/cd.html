@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쏘카 QnA 게시판</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        .qna-form {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .qna-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .qna-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .qna-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .qna-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qna-item.answered {
+            border-left-color: #48bb78;
+        }
+
+        .qna-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .qna-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .qna-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .qna-status.answered {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .qna-status.unanswered {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .qna-meta {
+            color: #718096;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .qna-question {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+
+        .qna-answer {
+            background: #e6fffa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 3px solid #48bb78;
+        }
+
+        .qna-answer-title {
+            font-weight: bold;
+            color: #22543d;
+            margin-bottom: 10px;
+        }
+
+        .qna-answer-content {
+            white-space: pre-wrap;
+        }
+
+        .qna-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .answer-form {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .answer-form.active {
+            display: block;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .qna-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .qna-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>쏘카 QnA 게시판</h1>
+            <p class="subtitle">궁금한 점을 물어보세요!</p>
+        </header>
+
+        <div class="content">
+            <div class="filter-buttons">
+                <button class="btn btn-primary" onclick="toggleQnAForm()">새 질문 작성</button>
+                <button class="btn btn-secondary" onclick="loadAllQnAs()">전체 보기</button>
+                <button class="btn btn-success" onclick="loadAnsweredQnAs()">답변 완료</button>
+                <button class="btn btn-warning" onclick="loadUnansweredQnAs()">답변 대기</button>
+            </div>
+
+            <div class="qna-form" id="qnaForm">
+                <h3 style="margin-bottom: 15px; color: #2d3748;">새 질문 작성</h3>
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" placeholder="질문 제목을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="author">작성자</label>
+                    <input type="text" id="author" placeholder="이름을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label for="question">질문 내용</label>
+                    <textarea id="question" placeholder="질문 내용을 입력하세요"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="submitQnA()">작성 완료</button>
+                    <button class="btn btn-secondary" onclick="toggleQnAForm()">취소</button>
+                </div>
+            </div>
+
+            <div class="qna-list" id="qnaList">
+                <div class="no-data">질문을 불러오는 중...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api/qna';
+
+        // Toggle QnA form
+        function toggleQnAForm() {
+            const form = document.getElementById('qnaForm');
+            form.classList.toggle('active');
+            if (!form.classList.contains('active')) {
+                clearForm();
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('title').value = '';
+            document.getElementById('author').value = '';
+            document.getElementById('question').value = '';
+        }
+
+        // Load all QnAs
+        async function loadAllQnAs() {
+            try {
+                const response = await fetch(API_BASE_URL);
+                const qnas = await response.json();
+                displayQnAs(qnas);
+            } catch (error) {
+                console.error('Error loading QnAs:', error);
+                displayError('질문을 불러오는데 실패했습니다.');
+            }
+        }
+
+        // Load answered QnAs
+        async function loadAnsweredQnAs() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/answered`);
+                const qnas = await response.json();
+                displayQnAs(qnas);
+            } catch (error) {
+                console.error('Error loading answered QnAs:', error);
+                displayError('답변 완료된 질문을 불러오는데 실패했습니다.');
+            }
+        }
+
+        // Load unanswered QnAs
+        async function loadUnansweredQnAs() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/unanswered`);
+                const qnas = await response.json();
+                displayQnAs(qnas);
+            } catch (error) {
+                console.error('Error loading unanswered QnAs:', error);
+                displayError('답변 대기 중인 질문을 불러오는데 실패했습니다.');
+            }
+        }
+
+        // Submit new QnA
+        async function submitQnA() {
+            const title = document.getElementById('title').value.trim();
+            const author = document.getElementById('author').value.trim();
+            const question = document.getElementById('question').value.trim();
+
+            if (!title || !author || !question) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, author, question })
+                });
+
+                if (response.ok) {
+                    alert('질문이 등록되었습니다.');
+                    toggleQnAForm();
+                    loadAllQnAs();
+                } else {
+                    alert('질문 등록에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error submitting QnA:', error);
+                alert('질문 등록 중 오류가 발생했습니다.');
+            }
+        }
+
+        // Display QnAs
+        function displayQnAs(qnas) {
+            const listContainer = document.getElementById('qnaList');
+
+            if (qnas.length === 0) {
+                listContainer.innerHTML = '<div class="no-data">등록된 질문이 없습니다.</div>';
+                return;
+            }
+
+            listContainer.innerHTML = qnas.map(qna => `
+                <div class="qna-item ${qna.answered ? 'answered' : ''}">
+                    <div class="qna-header">
+                        <div class="qna-title">${escapeHtml(qna.title)}</div>
+                        <div class="qna-status ${qna.answered ? 'answered' : 'unanswered'}">
+                            ${qna.answered ? '답변 완료' : '답변 대기'}
+                        </div>
+                    </div>
+                    <div class="qna-meta">
+                        작성자: ${escapeHtml(qna.author)} |
+                        작성일: ${formatDate(qna.createdAt)}
+                        ${qna.updatedAt ? ' | 수정일: ' + formatDate(qna.updatedAt) : ''}
+                    </div>
+                    <div class="qna-question">
+                        ${escapeHtml(qna.question)}
+                    </div>
+                    ${qna.answered ? `
+                        <div class="qna-answer">
+                            <div class="qna-answer-title">답변</div>
+                            <div class="qna-answer-content">${escapeHtml(qna.answer)}</div>
+                        </div>
+                    ` : `
+                        <div class="answer-form" id="answerForm-${qna.id}">
+                            <div class="form-group">
+                                <label>답변 작성</label>
+                                <textarea id="answer-${qna.id}" placeholder="답변을 입력하세요"></textarea>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-success" onclick="submitAnswer(${qna.id})">답변 등록</button>
+                                <button class="btn btn-secondary" onclick="toggleAnswerForm(${qna.id})">취소</button>
+                            </div>
+                        </div>
+                    `}
+                    <div class="qna-actions">
+                        ${!qna.answered ? `<button class="btn btn-success" onclick="toggleAnswerForm(${qna.id})">답변하기</button>` : ''}
+                        <button class="btn btn-danger" onclick="deleteQnA(${qna.id})">삭제</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle answer form
+        function toggleAnswerForm(id) {
+            const form = document.getElementById(`answerForm-${id}`);
+            form.classList.toggle('active');
+        }
+
+        // Submit answer
+        async function submitAnswer(id) {
+            const answer = document.getElementById(`answer-${id}`).value.trim();
+
+            if (!answer) {
+                alert('답변 내용을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}/answer`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answer })
+                });
+
+                if (response.ok) {
+                    alert('답변이 등록되었습니다.');
+                    loadAllQnAs();
+                } else {
+                    alert('답변 등록에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                alert('답변 등록 중 오류가 발생했습니다.');
+            }
+        }
+
+        // Delete QnA
+        async function deleteQnA(id) {
+            if (!confirm('정말 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('질문이 삭제되었습니다.');
+                    loadAllQnAs();
+                } else {
+                    alert('질문 삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error deleting QnA:', error);
+                alert('질문 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // Display error
+        function displayError(message) {
+            const listContainer = document.getElementById('qnaList');
+            listContainer.innerHTML = `<div class="no-data">${message}</div>`;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ko-KR');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load QnAs on page load
+        window.addEventListener('DOMContentLoaded', loadAllQnAs);
+    </script>
+</body>
+</html>

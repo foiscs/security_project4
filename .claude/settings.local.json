@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -uroot -pqkrqntjd06 -e \"USE ssocar; SHOW TABLES;\")",
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -uroot -pqkrqntjd06 ssocar -e \"SELECT COUNT(*) as total_users FROM users; SELECT COUNT(*) as total_vehicles FROM vehicles; SELECT COUNT(*) as total_reservations FROM reservations;\")",
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -uroot -pqkrqntjd06 -e \"CREATE DATABASE IF NOT EXISTS car_db;\")",
+      "Bash(\"C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe\" -uroot -pqkrqntjd06 -e \"USE car_db; SELECT * FROM qna;\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
