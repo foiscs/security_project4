@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql:*)",
+      "Bash(find:*)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"ALTER TABLE qnapost MODIFY COLUMN user_id CHAR(36);\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"ALTER TABLE qnapost ADD CONSTRAINT fk_qnapost_user FOREIGN KEY (user_id) REFERENCES users(user_id);\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"SELECT COLUMN_NAME, COLUMN_TYPE, CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=''ssocar'' AND TABLE_NAME=''users'' AND COLUMN_NAME=''user_id'';\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"SELECT COLUMN_NAME, COLUMN_TYPE, CHARACTER_SET_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=''ssocar'' AND TABLE_NAME=''qnapost'' AND COLUMN_NAME=''user_id'';\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"ALTER TABLE qnapost MODIFY COLUMN user_id CHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"/c/Program Files/MySQL/MySQL Shell 8.0/bin/mysqlsh\" --sql -u root -pqkrqntjd06 -h localhost -D ssocar -e \"SHOW CREATE TABLE qnapost\\G\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
