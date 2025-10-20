@@ -24,6 +24,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'com.mysql:mysql-connector-j:8.0.33' // ★ 최신 MySQL 드라이버
 }
 
 tasks.named('test') {

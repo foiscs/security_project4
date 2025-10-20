@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface VehicleTelemetryRepository extends JpaRepository<VehicleTelemetry, Long> {
@@ -24,8 +23,8 @@ public interface VehicleTelemetryRepository extends JpaRepository<VehicleTelemet
     );
 
     // 특정 차량의 최신 텔레메트리 조회
-    @Query("SELECT t FROM VehicleTelemetry t WHERE t.vehicle.vehicleId = :vehicleId ORDER BY t.ts DESC LIMIT 1")
-    Optional<VehicleTelemetry> findLatestByVehicleId(@Param("vehicleId") String vehicleId);
+    @Query("SELECT t FROM VehicleTelemetry t WHERE t.vehicle.vehicleId = :vehicleId ORDER BY t.ts DESC")
+    List<VehicleTelemetry> findLatestByVehicleId(@Param("vehicleId") String vehicleId);
 
     // 시동이 켜진 차량 조회
     @Query("SELECT DISTINCT t.vehicle.vehicleId FROM VehicleTelemetry t WHERE t.ignition = true AND t.ts > :since")
