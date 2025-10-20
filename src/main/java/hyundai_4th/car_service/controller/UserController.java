@@ -6,8 +6,6 @@ import hyundai_4th.car_service.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
@@ -22,7 +20,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserResponse getById(@PathVariable UUID userId) {
+    public UserResponse getById(@PathVariable String userId) {
         return userService.getById(userId);
     }
 
@@ -32,7 +30,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserResponse update(@PathVariable UUID userId,
+    public UserResponse update(@PathVariable String userId,
                                @RequestBody UserRequest req) {
         return userService.update(userId, req);
     }

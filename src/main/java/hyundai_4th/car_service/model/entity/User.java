@@ -1,6 +1,6 @@
 package hyundai_4th.car_service.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.time.LocalDateTime;
 

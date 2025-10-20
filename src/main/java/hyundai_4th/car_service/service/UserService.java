@@ -8,8 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 public class UserService {
 
@@ -45,7 +43,7 @@ public class UserService {
 
     /* 단건 조회 */
     @Transactional(readOnly = true)
-    public UserResponse getById(UUID id) {
+    public UserResponse getById(String id) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
         return toDto(u);
@@ -61,7 +59,7 @@ public class UserService {
 
     /* 부분 수정 (name/phone/status/password만 반영) */
     @Transactional
-    public UserResponse update(UUID id, UserRequest req) {
+    public UserResponse update(String id, UserRequest req) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
 

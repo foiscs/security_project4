@@ -1,6 +1,6 @@
 package hyundai_4th.car_service.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,8 +13,11 @@ public class QnaPost {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;  // 작성자 (NULL 가능)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", columnDefinition = "VARCHAR(36)")
+    private User user;  // 작성자 (User 엔티티 참조)
+
+    @Column(name = "author", length = 100)
+    private String author;  // 작성자 이름 (임시 호환성 유지)
 
     @Column(name = "title", length = 200, nullable = false)
     private String title;  // 제목
@@ -57,8 +60,8 @@ public class QnaPost {
     }
 
     // 생성자
-    public QnaPost(User user, String title, String content) {
-        this.user = user;
+    public QnaPost(String author, String title, String content) {
+        this.author = author;
         this.title = title;
         this.content = content;
     }
@@ -72,12 +75,12 @@ public class QnaPost {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getTitle() {
@@ -118,5 +121,13 @@ public class QnaPost {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

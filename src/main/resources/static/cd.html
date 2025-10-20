@@ -309,16 +309,20 @@
             <div class="qna-form" id="qnaForm">
                 <h3 style="margin-bottom: 15px; color: #2d3748;">새 질문 작성</h3>
                 <div class="form-group">
+                    <label for="author">작성자</label>
+                    <input type="text" id="author" placeholder="작성자 이름을 입력하세요">
+                </div>
+                <div class="form-group">
                     <label for="title">제목</label>
                     <input type="text" id="title" placeholder="질문 제목을 입력하세요">
                 </div>
                 <div class="form-group">
-                    <label for="author">작성자</label>
-                    <input type="text" id="author" placeholder="이름을 입력하세요">
+                    <label for="category">카테고리</label>
+                    <input type="text" id="category" placeholder="카테고리를 입력하세요 (선택사항)">
                 </div>
                 <div class="form-group">
-                    <label for="question">질문 내용</label>
-                    <textarea id="question" placeholder="질문 내용을 입력하세요"></textarea>
+                    <label for="content">질문 내용</label>
+                    <textarea id="content" placeholder="질문 내용을 입력하세요"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-primary" onclick="submitQnA()">작성 완료</button>
@@ -346,9 +350,10 @@
 
         // Clear form
         function clearForm() {
-            document.getElementById('title').value = '';
             document.getElementById('author').value = '';
-            document.getElementById('question').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('content').value = '';
         }
 
         // Load all QnAs
@@ -389,12 +394,13 @@
 
         // Submit new QnA
         async function submitQnA() {
-            const title = document.getElementById('title').value.trim();
             const author = document.getElementById('author').value.trim();
-            const question = document.getElementById('question').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const category = document.getElementById('category').value.trim();
+            const content = document.getElementById('content').value.trim();
 
-            if (!title || !author || !question) {
-                alert('모든 필드를 입력해주세요.');
+            if (!author || !title || !content) {
+                alert('작성자, 제목, 내용을 입력해주세요.');
                 return;
             }
 
@@ -404,7 +410,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ title, author, question })
+                    body: JSON.stringify({ author, title, content, category })
                 });
 
                 if (response.ok) {
@@ -430,79 +436,49 @@
             }
 
             listContainer.innerHTML = qnas.map(qna => `
-                <div class="qna-item ${qna.answered ? 'answered' : ''}">
+                <div class="qna-item ${qna.status === '답변완료' ? 'answered' : ''}">
                     <div class="qna-header">
                         <div class="qna-title">${escapeHtml(qna.title)}</div>
-                        <div class="qna-status ${qna.answered ? 'answered' : 'unanswered'}">
-                            ${qna.answered ? '답변 완료' : '답변 대기'}
+                        <div class="qna-status ${qna.status === '답변완료' ? 'answered' : 'unanswered'}">
+                            ${qna.status || '접수됨'}
                         </div>
                     </div>
                     <div class="qna-meta">
-                        작성자: ${escapeHtml(qna.author)} |
+                        작성자: ${escapeHtml(qna.author || '익명')} |
                         작성일: ${formatDate(qna.createdAt)}
-                        ${qna.updatedAt ? ' | 수정일: ' + formatDate(qna.updatedAt) : ''}
+                        ${qna.category ? ' | 카테고리: ' + escapeHtml(qna.category) : ''}
                     </div>
                     <div class="qna-question">
-                        ${escapeHtml(qna.question)}
+                        ${escapeHtml(qna.content)}
                     </div>
-                    ${qna.answered ? `
-                        <div class="qna-answer">
-                            <div class="qna-answer-title">답변</div>
-                            <div class="qna-answer-content">${escapeHtml(qna.answer)}</div>
-                        </div>
-                    ` : `
-                        <div class="answer-form" id="answerForm-${qna.id}">
-                            <div class="form-group">
-                                <label>답변 작성</label>
-                                <textarea id="answer-${qna.id}" placeholder="답변을 입력하세요"></textarea>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-success" onclick="submitAnswer(${qna.id})">답변 등록</button>
-                                <button class="btn btn-secondary" onclick="toggleAnswerForm(${qna.id})">취소</button>
-                            </div>
-                        </div>
-                    `}
                     <div class="qna-actions">
-                        ${!qna.answered ? `<button class="btn btn-success" onclick="toggleAnswerForm(${qna.id})">답변하기</button>` : ''}
+                        ${qna.status === '접수됨' ? `<button class="btn btn-success" onclick="markAsAnswered(${qna.id})">답변완료 처리</button>` : ''}
                         <button class="btn btn-danger" onclick="deleteQnA(${qna.id})">삭제</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Toggle answer form
-        function toggleAnswerForm(id) {
-            const form = document.getElementById(`answerForm-${id}`);
-            form.classList.toggle('active');
-        }
-
-        // Submit answer
-        async function submitAnswer(id) {
-            const answer = document.getElementById(`answer-${id}`).value.trim();
-
-            if (!answer) {
-                alert('답변 내용을 입력해주세요.');
+        // Mark as answered
+        async function markAsAnswered(id) {
+            if (!confirm('답변완료로 처리하시겠습니까?')) {
                 return;
             }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/${id}/answer`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ answer })
+                    method: 'POST'
                 });
 
                 if (response.ok) {
-                    alert('답변이 등록되었습니다.');
+                    alert('답변완료 처리되었습니다.');
                     loadAllQnAs();
                 } else {
-                    alert('답변 등록에 실패했습니다.');
+                    alert('처리에 실패했습니다.');
                 }
             } catch (error) {
-                console.error('Error submitting answer:', error);
-                alert('답변 등록 중 오류가 발생했습니다.');
+                console.error('Error marking as answered:', error);
+                alert('처리 중 오류가 발생했습니다.');
             }
         }
 

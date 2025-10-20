@@ -1,6 +1,6 @@
 package hyundai_4th.car_service.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

@@ -1,17 +1,16 @@
 package hyundai_4th.car_service.model.dto;
 
-import java.time.Instant;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 public class UserResponse {
-    private UUID user_id;
+    private String user_id;
     private String email;
     private String name;
     private String phone;
     private String status;
-    private Instant created_at;
+    private LocalDateTime created_at;
 
-    public UserResponse(UUID id, String email, String name, String phone, String status, Instant createdAt) {
+    public UserResponse(String id, String email, String name, String phone, String status, LocalDateTime createdAt) {
         this.user_id = id;
         this.email = email;
         this.name = name;
@@ -20,10 +19,10 @@ public class UserResponse {
         this.created_at = createdAt;
     }
 
-    public UUID getUser_id() { return user_id; }
+    public String getUser_id() { return user_id; }
     public String getEmail() { return email; }
     public String getName() { return name; }
     public String getPhone() { return phone; }
     public String getStatus() { return status; }
-    public Instant getCreated_at() { return created_at; }
+    public LocalDateTime getCreated_at() { return created_at; }
 }
