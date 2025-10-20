@@ -1,37 +1,37 @@
-package hyundai_4th.car_service.model.entity;
+package hyundai_4th.car_service.model.dto;
 
-import javax.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+import hyundai_4th.car_service.model.entity.Location;
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "locations")
-public class Location {
+/**
+ * 위치 정보 응답 DTO
+ * 대여소/반납소 정보 반환
+ */
+public class LocationResponse {
 
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @Column(name = "location_id", length = 36, nullable = false)
     private String locationId;
-
-    @Column(name = "name", length = 200, nullable = false)
     private String name;
-
-    @Column(name = "lat", precision = 9, scale = 6, nullable = false)
-    private BigDecimal lat;  // 위도
-
-    @Column(name = "lng", precision = 9, scale = 6, nullable = false)
-    private BigDecimal lng;  // 경도
-
-    @Column(name = "type", length = 30, nullable = false)
-    private String type;  // 위치 타입 (예: "rental_station", "parking" 등)
+    private BigDecimal lat;
+    private BigDecimal lng;
+    private String type;
 
     // 기본 생성자
-    public Location() {
+    public LocationResponse() {
     }
 
-    // 생성자
-    public Location(String name, BigDecimal lat, BigDecimal lng, String type) {
+    // Entity를 DTO로 변환하는 생성자
+    public LocationResponse(Location location) {
+        this.locationId = location.getLocationId();
+        this.name = location.getName();
+        this.lat = location.getLat();
+        this.lng = location.getLng();
+        this.type = location.getType();
+    }
+
+    // 전체 생성자
+    public LocationResponse(String locationId, String name, BigDecimal lat,
+                            BigDecimal lng, String type) {
+        this.locationId = locationId;
         this.name = name;
         this.lat = lat;
         this.lng = lng;
