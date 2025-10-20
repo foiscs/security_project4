@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User_SIgnup {
+public class User_Signup {
 
     @Id
     @GeneratedValue(generator = "uuid2")
