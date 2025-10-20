@@ -27,7 +27,7 @@ module "ec2"{
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
   # ami_id            = data.aws_ami.web.id
-  web_ami_id          = aws_ami_copy.web_copy_to_seoul.id
+  web_ami_id          = var.source_ami_id_use1  # 서울 리전에 변환된 커스텀 AMI 사용
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
@@ -218,41 +218,5 @@ resource "aws_cloudwatch_log_group" "security_logs" {
   tags = merge(var.common_tags, {
     Name      = "${var.project_name}-security-logs"
     Component = "Monitoring"
-  })
-}
-
-
-# =========================================
-# Local Values (공통 설정)
-# =========================================
-
-
-# module "ecr" {
-#   source = "./modules/ecr"
-#   name = "myapp"
-#   tags = {
-#     Environment = "dev"
-#     Project     = "myproject"
-#   }
-# }
-
-
-# =========================================
-# Local Values (공통 설정)
-# =========================================
-
-# us-east-1 → ap-northeast-2로 복사
-resource "aws_ami_copy" "web_copy_to_seoul" {
-  name          = "web-base-seoul-${var.project_name}-${formatdate("YYYYMMDD-hhmmss", timestamp())}"
-  description   = "Copied from ${var.source_ami_id_use1} (us-east-1) to ap-northeast-2"
-  source_ami_id = var.source_ami_id_use1
-  source_ami_region = "us-east-1"
-
-  # 소스 스냅샷이 암호화되어 있다면 아래 두 줄 활성화 + 서울 KMS 키 지정
-  # encrypted  = true
-  # kms_key_id = aws_kms_key.main.arn
-
-  tags = merge(var.common_tags, {
-    Role = "web-base"
   })
 }

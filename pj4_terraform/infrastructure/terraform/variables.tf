@@ -115,38 +115,6 @@ variable "db_password" {
   }
 }
 
-
-
-
-
-# =========================================
-# EKS 클러스터 설정
-# =========================================
-
-
-# variable "cluster_name" {
-#  description = "EKS 클러스터 이름"
-#  type        = string
-#  default     = ""  # 자동으로 project_name-environment-eks로 생성
-# }
-
-
-# variable "ec2_key_pair_name" {
-#   description = "EKS 노드 그룹 SSH 접근용 키 페어 이름"
-#   type        = string
-#   default     = null
-# }
-
-# variable "allowed_ssh_cidrs" {
-#   description = "SSH 접근을 허용할 CIDR 블록들"
-#   type        = list(string)
-#   default     = ["10.0.0.0/16"]  # VPC 내부만 허용
-# }
-
-
-
-
-
 # =========================================
 # S3 버킷 설정
 # =========================================
@@ -942,8 +910,9 @@ variable "application_port" {
 }
 
 
-# 소스 AMI ID 입력
+# 소스 AMI ID 입력 (OVA에서 변환된 서울 리전의 커스텀 AMI)
 variable "source_ami_id_use1" {
-  type = string
-  default = "ami-03b0345dae9dfe6eb"
+  type        = string
+  default     = "ami-0f611aeb49e43b025"
+  description = "Custom AMI converted from OVA in Seoul region"
 }
