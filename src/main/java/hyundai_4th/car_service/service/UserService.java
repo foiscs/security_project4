@@ -8,8 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -24,7 +22,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /* 회원가입 */
     @Transactional
     public UserResponse create(UserRequest req) {
         if (req.getEmail() == null || req.getEmail().isBlank())
@@ -45,7 +42,6 @@ public class UserService {
         return toDto(saved);
     }
 
-    /* 단건 조회 */
     @Transactional(readOnly = true)
     public UserResponse getById(UUID id) {
         User_Signup u = userRepository.findById(id)
@@ -53,7 +49,6 @@ public class UserService {
         return toDto(u);
     }
 
-    /* 이메일로 조회 */
     @Transactional(readOnly = true)
     public UserResponse getByEmail(String email) {
         User_Signup u = userRepository.findByEmail(email)
@@ -61,7 +56,6 @@ public class UserService {
         return toDto(u);
     }
 
-    /* 부분 수정 (name/phone/status/password만 반영) */
     @Transactional
     public UserResponse update(UUID id, UserRequest req) {
         User_Signup u = userRepository.findById(id)
@@ -78,12 +72,12 @@ public class UserService {
 
     private UserResponse toDto(User_Signup u) {
         return new UserResponse(
-                u.getUserId().toString(),
+                u.getUserId(),
                 u.getEmail(),
                 u.getName(),
                 u.getPhone(),
                 u.getStatus(),
-                LocalDateTime.ofInstant(u.getCreatedAt(), ZoneId.systemDefault())
+                u.getCreatedAt()
         );
     }
 }
