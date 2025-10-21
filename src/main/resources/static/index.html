@@ -33,6 +33,13 @@
 </div>
 
 <div>
+    <input id="doorVehicleId" placeholder="vehicle_id (UUID)" style="width: 360px;">
+    <button onclick="getDoorStatus()">상태조회</button>
+    <button onclick="openDoor()">문 열기</button>
+    <button onclick="closeDoor()">문 닫기</button>
+</div>
+
+<div>
     <h3>부분 수정</h3>
     <input id="patchId" placeholder="user_id (UUID)">
     <input id="patchPhone" placeholder="새 phone">
@@ -86,6 +93,63 @@
       });
       document.getElementById("result").textContent = await res.text();
     }
+//door control
+    const DOOR_BASE = (vid) => `http://localhost:8080/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
+
+    async function getDoorStatus() {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      const res = await fetch(DOOR_BASE(vid));
+      document.getElementById("doorResult").textContent = await res.text();
+    }
+
+    async function openDoor() {
+      await sendDoorCmd(true);
+    }
+
+    async function closeDoor() {
+      await sendDoorCmd(false);
+    }
+
+    async function sendDoorCmd(open) {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      const res = await fetch(DOOR_BASE(vid), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: open ? "OPEN" : "CLOSE" })
+      });
+      document.getElementById("doorResult").textContent = await res.text();
+    }
+
+    const doorBase = (vid) => `/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
+
+    async function getDoorStatus() {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      const res = await fetch(doorBase(vid), { credentials: 'same-origin' });
+      const text = await res.text();
+      document.getElementById("doorResult").textContent =
+        `${res.status} ${res.statusText}\n${text || '(빈 응답)'}`;
+    }
+
+    async function sendDoorCmd(open) {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      const res = await fetch(doorBase(vid), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: open ? "OPEN" : "CLOSE" }),
+        credentials: 'same-origin' // 세션 쿠키 포함
+      });
+      const text = await res.text();
+      document.getElementById("doorResult").textContent =
+        `${res.status} ${res.statusText}\n${text || '(빈 응답)'}`;
+      if (res.ok) { await getDoorStatus(); } // 성공 시 즉시 상태 갱신
+    }
+
+    function openDoor()  { sendDoorCmd(true); }
+    function closeDoor() { sendDoorCmd(false); }
 </script>
 </body>
 </html>
