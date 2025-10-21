@@ -1,49 +1,45 @@
 package hyundai_4th.car_service.repository;
 
-import hyundai_4th.car_service.model.entity.Rental;
-import hyundai_4th.car_service.model.entity.Rental.RentalStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import hyundai_4th.car_service.model.entity.RentalEntity.Rental;
+import hyundai_4th.car_service.model.entity.RentalEntity.Reservation;
+import hyundai_4th.car_service.model.entity.RentalEntity.Vehicle;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Repository
-public interface RentalRepository extends JpaRepository<Rental, String> {
+public class RentalRepository {
 
-    // 특정 사용자의 대여 목록 조회
-    List<Rental> findByUser_UserId(String userId);
+    @PersistenceContext
+    private EntityManager em;
 
-    // 특정 사용자의 특정 상태 대여 조회
-    List<Rental> findByUser_UserIdAndStatus(String userId, RentalStatus status);
+    public void saveRental(Rental r) { em.merge(r); }
 
-    // 특정 사용자의 현재 진행 중인 대여 조회
-    @Query("SELECT r FROM Rental r WHERE r.user.userId = :userId AND r.status = 'ONGOING'")
-    List<Rental> findOngoingRentalsByUserId(@Param("userId") String userId);
+    public Optional<Rental> findRental(String id) {
+        return Optional.ofNullable(em.find(Rental.class, id));
+    }
 
-    // 특정 차량의 대여 목록 조회
-    List<Rental> findByVehicle_VehicleId(String vehicleId);
+    public Optional<Reservation> findReservation(String id) {
+        return Optional.ofNullable(em.find(Reservation.class, id));
+    }
 
-    // 특정 차량의 현재 진행 중인 대여 조회
-    Optional<Rental> findByVehicle_VehicleIdAndStatus(String vehicleId, RentalStatus status);
+    public Optional<Vehicle> findVehicle(String id) {
+        return Optional.ofNullable(em.find(Vehicle.class, id));
+    }
 
-    // 특정 예약의 대여 조회
-    Optional<Rental> findByReservation_ReservationId(String reservationId);
+    public void updateReservationStatus(String reservationId, String status) {
+        em.createQuery("UPDATE Reservation r SET r.status = :s WHERE r.reservationId = :id")
+                .setParameter("s", status)
+                .setParameter("id", reservationId)
+                .executeUpdate();
+    }
 
-    // 대여 상태로 조회
-    List<Rental> findByStatus(RentalStatus status);
-
-    // 특정 기간 동안의 대여 조회
-    List<Rental> findByStartActualBetween(LocalDateTime start, LocalDateTime end);
-
-    // 특정 사용자의 대여 이력 조회 (완료된 대여만)
-    @Query("SELECT r FROM Rental r WHERE r.user.userId = :userId AND r.status = 'RETURNED' ORDER BY r.startActual DESC")
-    List<Rental> findRentalHistoryByUserId(@Param("userId") String userId);
-
-    // 반납 예정일이 지났는데 아직 반납 안 된 대여 조회 (연체)
-    @Query("SELECT r FROM Rental r WHERE r.reservation.endAt < :currentTime AND r.status = 'ONGOING'")
-    List<Rental> findOverdueRentals(@Param("currentTime") LocalDateTime currentTime);
+    public void updateVehicleStatus(String vehicleId, String status) {
+        em.createQuery("UPDATE Vehicle v SET v.status = :s WHERE v.vehicleId = :id")
+                .setParameter("s", status)
+                .setParameter("id", vehicleId)
+                .executeUpdate();
+    }
 }
