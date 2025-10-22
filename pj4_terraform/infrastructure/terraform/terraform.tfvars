@@ -12,4 +12,9 @@ environment        = "dev"
 project_name       = "dev-app"
 #create_launch_template = false
 enable_load_balancer = true
+<<<<<<< Updated upstream
 application_port     = 8080
+=======
+application_port     = 8080
+web_ami_id = "ami-09e629c5db47cb756" 
+>>>>>>> Stashed changes

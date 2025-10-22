@@ -1,16 +1,4 @@
 ﻿
-
-data "aws_ami" "web" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-
-
-
 # =========================================
 # EC2 Module - ALB, ASG, TG, EC2
 # =========================================
@@ -27,7 +15,7 @@ module "ec2"{
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
   # ami_id            = data.aws_ami.web.id
-  web_ami_id          = aws_ami_copy.web_copy_to_seoul.id
+  web_ami_id          = var.source_ami_id_use1  # 서울 리전에 변환된 커스텀 AMI 사용
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
@@ -172,7 +160,31 @@ module "rds" {
 
 }
 
+# =========================================
+# S3 Module - for service
+# =========================================
 
+# module "s3" {
+#   source = "./modules/s3"
+
+#   # 필수
+#   project_name = var.project_name          # 예: "dev-app"
+#   environment  = var.environment           # 예: "dev" | "staging" | "prod"
+
+#   # 권장 기본값들
+#   force_destroy       = false              # 운영용이면 false 권장
+#   create_kms_key      = true               # 모듈이 KMS Key & Alias 생성
+#   enable_versioning   = true
+#   log_retention_days  = 365                # ISMS-P 최소 365
+#   transition_to_ia_days           = 30
+#   transition_to_glacier_days      = 90
+#   transition_to_deep_archive_days = 180
+
+#   # 태그
+#   common_tags = merge(var.common_tags, {
+#     Component = "S3"
+#   })
+# }
 
 
 # =========================================

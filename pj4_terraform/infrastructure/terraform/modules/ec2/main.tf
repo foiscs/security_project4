@@ -24,7 +24,7 @@ resource "aws_autoscaling_group" "web" {
   vpc_zone_identifier       = var.private_subnet_ids
   launch_template {
     id      = aws_launch_template.web.id
-    version = "$Latest"
+    version = aws_launch_template.web.latest_version
   }
   instance_refresh {
     strategy  = "Rolling"
@@ -254,3 +254,46 @@ resource "aws_lb_listener" "web" {
     Component = "LoadBalancer"
   })
 }
+
+
+
+# =========================================
+# EC2가 사용할 역할 (s3)
+# =========================================
+# data "aws_iam_policy_document" "ec2_trust" {
+#   statement {
+#     effect = "Allow"
+#     principals { type = "Service", identifiers = ["ec2.amazonaws.com"] }
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
+# resource "aws_iam_role" "web" {
+#   name               = "${var.project_name}-web-role"
+#   assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
+# }
+
+# S3 특정 버킷/프리픽스 읽기 전용
+# data "aws_iam_policy_document" "web_s3_read" {
+#   statement {
+#     actions   = ["s3:GetObject","s3:ListBucket"]
+#     resources = [
+#       "arn:aws:s3:::${var.service_bucket}",
+#       "arn:aws:s3:::${var.service_bucket}/*",
+#     ]
+#   }
+# }
+# resource "aws_iam_policy" "web_s3_read" {
+#   name   = "${var.project_name}-web-s3-read"
+#   policy = data.aws_iam_policy_document.web_s3_read.json
+# }
+# resource "aws_iam_role_policy_attachment" "web_s3_read" {
+#   role       = aws_iam_role.web.name
+#   policy_arn = aws_iam_policy.web_s3_read.arn
+# }
+
+# resource "aws_iam_instance_profile" "web" {
+#   name = "${var.project_name}-web-profile"
+#   role = aws_iam_role.web.name
+# }
+
+
