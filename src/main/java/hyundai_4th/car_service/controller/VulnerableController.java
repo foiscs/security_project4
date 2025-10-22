@@ -6,10 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * Spring4Shell (CVE-2022-22965) 취약점 테스트용 컨트롤러
- * 교육 목적 - 격리된 환경에서만 사용
- */
 @Controller
 @RequestMapping("/vulnerable")
 public class VulnerableController {

@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservations",
-       uniqueConstraints = {
-           @UniqueConstraint(columnNames = {"reservation_id", "user_id", "vehicle_id"})
-       },
-       indexes = {
-           @Index(name = "idx_resv_vehicle_period", columnList = "vehicle_id, start_at, end_at, status"),
-           @Index(name = "idx_resv_vehicle_start", columnList = "vehicle_id, start_at")
-       })
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"reservation_id", "user_id", "vehicle_id"})
+        },
+        indexes = {
+                @Index(name = "idx_resv_vehicle_period", columnList = "vehicle_id, start_at, end_at, status"),
+                @Index(name = "idx_resv_vehicle_start", columnList = "vehicle_id, start_at")
+        })
 public class Reservation {
 
     @Id

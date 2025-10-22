@@ -5,10 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vehicle_telemetry",
-       indexes = {
-           @Index(name = "idx_tel_vehicle_time", columnList = "vehicle_id, ts")
-       })
+@Table(name = "vehicle_telemetry")
 public class VehicleTelemetry {
 
     @Id
@@ -16,100 +13,55 @@ public class VehicleTelemetry {
     @Column(name = "telemetry_id")
     private Long telemetryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id", nullable = false)
-    private Vehicle vehicle;
+    @Column(name = "vehicle_id", length = 36, nullable = false)
+    private String vehicleId;
 
     @Column(name = "ts", nullable = false)
-    private LocalDateTime ts;  // 타임스탬프
+    private LocalDateTime ts;
 
     @Column(name = "lat", precision = 9, scale = 6)
-    private BigDecimal lat;  // 위도
+    private BigDecimal lat;
 
     @Column(name = "lng", precision = 9, scale = 6)
-    private BigDecimal lng;  // 경도
+    private BigDecimal lng;
 
     @Column(name = "speed")
-    private Double speed;  // 속도 (km/h)
+    private Double speed;
 
     @Column(name = "ignition")
-    private Boolean ignition;  // 시동 상태
+    private Boolean ignition;
 
-    @Column(name = "raw_payload", columnDefinition = "JSON")
-    private String rawPayload;  // JSON 원시 데이터
+    @Column(name = "door_open", nullable = false)
+    private Boolean doorOpen = false;
 
-    // 기본 생성자
-    public VehicleTelemetry() {
-    }
+    @Column(name = "raw_payload", columnDefinition = "json")
+    private String rawPayload;
 
-    // 생성자
-    public VehicleTelemetry(Vehicle vehicle, LocalDateTime ts) {
-        this.vehicle = vehicle;
+    public VehicleTelemetry() {}
+
+    // 편의 생성자
+    public VehicleTelemetry(String vehicleId, LocalDateTime ts, Boolean doorOpen) {
+        this.vehicleId = vehicleId;
         this.ts = ts;
+        this.doorOpen = doorOpen;
     }
 
-    // Getter & Setter
-    public Long getTelemetryId() {
-        return telemetryId;
-    }
-
-    public void setTelemetryId(Long telemetryId) {
-        this.telemetryId = telemetryId;
-    }
-
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
-    }
-
-    public LocalDateTime getTs() {
-        return ts;
-    }
-
-    public void setTs(LocalDateTime ts) {
-        this.ts = ts;
-    }
-
-    public BigDecimal getLat() {
-        return lat;
-    }
-
-    public void setLat(BigDecimal lat) {
-        this.lat = lat;
-    }
-
-    public BigDecimal getLng() {
-        return lng;
-    }
-
-    public void setLng(BigDecimal lng) {
-        this.lng = lng;
-    }
-
-    public Double getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(Double speed) {
-        this.speed = speed;
-    }
-
-    public Boolean getIgnition() {
-        return ignition;
-    }
-
-    public void setIgnition(Boolean ignition) {
-        this.ignition = ignition;
-    }
-
-    public String getRawPayload() {
-        return rawPayload;
-    }
-
-    public void setRawPayload(String rawPayload) {
-        this.rawPayload = rawPayload;
-    }
+    // getters & setters
+    public Long getTelemetryId() { return telemetryId; }
+    public String getVehicleId() { return vehicleId; }
+    public void setVehicleId(String vehicleId) { this.vehicleId = vehicleId; }
+    public LocalDateTime getTs() { return ts; }
+    public void setTs(LocalDateTime ts) { this.ts = ts; }
+    public BigDecimal getLat() { return lat; }
+    public void setLat(BigDecimal lat) { this.lat = lat; }
+    public BigDecimal getLng() { return lng; }
+    public void setLng(BigDecimal lng) { this.lng = lng; }
+    public Double getSpeed() { return speed; }
+    public void setSpeed(Double speed) { this.speed = speed; }
+    public Boolean getIgnition() { return ignition; }
+    public void setIgnition(Boolean ignition) { this.ignition = ignition; }
+    public Boolean getDoorOpen() { return doorOpen; }
+    public void setDoorOpen(Boolean doorOpen) { this.doorOpen = doorOpen; }
+    public String getRawPayload() { return rawPayload; }
+    public void setRawPayload(String rawPayload) { this.rawPayload = rawPayload; }
 }

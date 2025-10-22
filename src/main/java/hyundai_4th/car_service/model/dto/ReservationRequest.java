@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
  */
 public class ReservationRequest {
 
-    private String userId;              // 사용자 ID
-    private String vehicleId;           // 차량 ID
-    private String pickupLocationId;    // 픽업 위치 ID
-    private String dropoffLocationId;   // 반납 위치 ID
-    private LocalDateTime startAt;      // 예약 시작 시각
-    private LocalDateTime endAt;        // 예약 종료 시각
+    private String userId;
+    private String vehicleId;
+    private String pickupLocationId;
+    private String dropoffLocationId;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
 
     // 기본 생성자
     public ReservationRequest() {

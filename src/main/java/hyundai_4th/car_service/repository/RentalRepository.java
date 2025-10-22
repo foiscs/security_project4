@@ -1,8 +1,8 @@
 package hyundai_4th.car_service.repository;
 
-import hyundai_4th.car_service.model.entity.RentalEntity.Rental;
-import hyundai_4th.car_service.model.entity.RentalEntity.Reservation;
-import hyundai_4th.car_service.model.entity.RentalEntity.Vehicle;
+import hyundai_4th.car_service.model.entity.Rental;
+import hyundai_4th.car_service.model.entity.Reservation;
+import hyundai_4th.car_service.model.entity.Vehicle;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -15,20 +15,27 @@ public class RentalRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public void saveRental(Rental r) { em.merge(r); }
+    /** 신규/수정 저장 */
+    public void saveRental(Rental r) {
+        em.merge(r);
+    }
 
+    /** 대여 단건 조회 */
     public Optional<Rental> findRental(String id) {
         return Optional.ofNullable(em.find(Rental.class, id));
     }
 
+    /** 예약 단건 조회 */
     public Optional<Reservation> findReservation(String id) {
         return Optional.ofNullable(em.find(Reservation.class, id));
     }
 
+    /** 차량 단건 조회 */
     public Optional<Vehicle> findVehicle(String id) {
         return Optional.ofNullable(em.find(Vehicle.class, id));
     }
 
+    /** 예약 상태 변경 */
     public void updateReservationStatus(String reservationId, String status) {
         em.createQuery("UPDATE Reservation r SET r.status = :s WHERE r.reservationId = :id")
                 .setParameter("s", status)
@@ -36,6 +43,7 @@ public class RentalRepository {
                 .executeUpdate();
     }
 
+    /** 차량 상태 변경 */
     public void updateVehicleStatus(String vehicleId, String status) {
         em.createQuery("UPDATE Vehicle v SET v.status = :s WHERE v.vehicleId = :id")
                 .setParameter("s", status)

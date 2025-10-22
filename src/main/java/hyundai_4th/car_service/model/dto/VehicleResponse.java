@@ -4,24 +4,22 @@ import hyundai_4th.car_service.model.entity.Vehicle;
 
 /**
  * 차량 정보 응답 DTO
- * 차량 검색, 대여 가능 차량 조회 시 사용
+ * Vehicle 엔티티의 주요 정보를 전달
  */
 public class VehicleResponse {
-
     private String vehicleId;
     private String vin;
     private String plate;
     private String model;
     private String brand;
-    private Integer year;
+    private int year;                // Vehicle 엔티티의 year 필드 타입에 맞춤
     private String status;
-    private LocationResponse currentLocation;
 
-    // 기본 생성자
-    public VehicleResponse() {
-    }
+    // ✅ 기존 currentLocation → currentLocationId 로 변경 (최소 수정)
+    private String currentLocationId;
 
-    // Entity를 DTO로 변환하는 생성자
+    public VehicleResponse() {}
+
     public VehicleResponse(Vehicle vehicle) {
         this.vehicleId = vehicle.getVehicleId();
         this.vin = vehicle.getVin();
@@ -30,87 +28,31 @@ public class VehicleResponse {
         this.brand = vehicle.getBrand();
         this.year = vehicle.getYear();
         this.status = vehicle.getStatus();
-        // 위치 정보도 DTO로 변환
-        if (vehicle.getCurrentLocation() != null) {
-            this.currentLocation = new LocationResponse(vehicle.getCurrentLocation());
-        }
+        this.currentLocationId = vehicle.getCurrentLocationId(); // ✅ 수정된 부분
     }
 
-    // 전체 생성자
-    public VehicleResponse(String vehicleId, String vin, String plate, String model,
-                           String brand, Integer year, String status, LocationResponse currentLocation) {
-        this.vehicleId = vehicleId;
-        this.vin = vin;
-        this.plate = plate;
-        this.model = model;
-        this.brand = brand;
-        this.year = year;
-        this.status = status;
-        this.currentLocation = currentLocation;
-    }
+    // ---- Getter & Setter ----
+    public String getVehicleId() { return vehicleId; }
+    public void setVehicleId(String vehicleId) { this.vehicleId = vehicleId; }
 
-    // Getter & Setter
-    public String getVehicleId() {
-        return vehicleId;
-    }
+    public String getVin() { return vin; }
+    public void setVin(String vin) { this.vin = vin; }
 
-    public void setVehicleId(String vehicleId) {
-        this.vehicleId = vehicleId;
-    }
+    public String getPlate() { return plate; }
+    public void setPlate(String plate) { this.plate = plate; }
 
-    public String getVin() {
-        return vin;
-    }
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
 
-    public void setVin(String vin) {
-        this.vin = vin;
-    }
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
 
-    public String getPlate() {
-        return plate;
-    }
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
 
-    public void setPlate(String plate) {
-        this.plate = plate;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocationResponse getCurrentLocation() {
-        return currentLocation;
-    }
-
-    public void setCurrentLocation(LocationResponse currentLocation) {
-        this.currentLocation = currentLocation;
-    }
+    public String getCurrentLocationId() { return currentLocationId; }
+    public void setCurrentLocationId(String currentLocationId) { this.currentLocationId = currentLocationId; }
 }

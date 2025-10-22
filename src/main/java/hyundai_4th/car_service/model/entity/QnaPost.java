@@ -13,24 +13,24 @@ public class QnaPost {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", columnDefinition = "VARCHAR(36)")
-    private User user;  // 작성자 (User 엔티티 참조)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 
     @Column(name = "author", length = 100)
-    private String author;  // 작성자 이름 (임시 호환성 유지)
+    private String author;
 
     @Column(name = "title", length = 200, nullable = false)
-    private String title;  // 제목
+    private String title;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
-    private String content;  // 내용
+    private String content;
 
     @Column(name = "category", length = 100)
-    private String category;  // 카테고리 (기본값: '')
+    private String category;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private QnaStatus status = QnaStatus.접수됨;  // 기본값: 접수됨
+    private QnaStatus status = QnaStatus.접수됨;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

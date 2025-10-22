@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments",
-       indexes = {
-           @Index(name = "idx_pay_rental_time", columnList = "rental_id, created_at"),
-           @Index(name = "ux_pay_pg_tx_id", columnList = "pg_tx_id", unique = true)
-       })
+        indexes = {
+                @Index(name = "idx_pay_rental_time", columnList = "rental_id, created_at"),
+                @Index(name = "ux_pay_pg_tx_id", columnList = "pg_tx_id", unique = true)
+        })
 public class Payment {
 
     @Id
@@ -21,38 +21,38 @@ public class Payment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_id", nullable = false)
-    private Rental rental;  // 대여 정보
+    private Rental rental;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 사용자
+    private User user;
 
     @Column(name = "amount", precision = 12, scale = 2, nullable = false)
-    private BigDecimal amount;  // 결제 금액
+    private BigDecimal amount;
 
     @Column(name = "currency", length = 3, nullable = false)
-    private String currency;  // 통화 (예: "KRW", "USD")
+    private String currency;
 
     @Column(name = "method", length = 30, nullable = false)
-    private String method;  // 결제 수단 (예: "card", "cash", "transfer")
+    private String method;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PaymentStatus status = PaymentStatus.AUTHORIZED;
 
     @Column(name = "pg_tx_id", length = 128)
-    private String pgTxId;  // PG사 거래 ID
+    private String pgTxId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     // 결제 상태 Enum
     public enum PaymentStatus {
-        AUTHORIZED,  // 승인됨
-        CAPTURED,    // 결제 완료
-        VOIDED,      // 취소됨
-        REFUNDED,    // 환불됨
-        FAILED       // 실패
+        AUTHORIZED,
+        CAPTURED,
+        VOIDED,
+        REFUNDED,
+        FAILED
     }
 
     // JPA 자동 시간 설정
