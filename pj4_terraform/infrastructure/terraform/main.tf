@@ -1,16 +1,4 @@
 ﻿
-
-data "aws_ami" "web" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
-
-
-
 # =========================================
 # EC2 Module - ALB, ASG, TG, EC2
 # =========================================
@@ -27,7 +15,7 @@ module "ec2"{
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
   # ami_id            = data.aws_ami.web.id
-  web_ami_id          = var.source_ami_id_use1  # 서울 리전에 변환된 커스텀 AMI 사용
+  web_ami_id          = var.web_ami_id
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
