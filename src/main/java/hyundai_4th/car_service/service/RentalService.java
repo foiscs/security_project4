@@ -17,6 +17,7 @@ import java.util.UUID;
 public class RentalService {
 
     private final RentalRepository repo;
+    private final PaymentService paymentService;
 
     @Transactional
     public RentalDTO.RentalResponse start(RentalDTO.RentalStartRequest req) {
@@ -63,6 +64,10 @@ public class RentalService {
         repo.saveRental(rental);
 
         repo.updateVehicleStatus(rental.getVehicleId(), "available");
+
+        // 반납 완료 후 자동 결제 생성
+        paymentService.createPaymentForRental(rental);
+
         return RentalDTO.RentalResponse.of(rental);
     }
 }
