@@ -1,12 +1,11 @@
 package hyundai_4th.car_service.repository;
 
-import hyundai_4th.car_service.model.entity.User_Signup;
 import org.springframework.data.jpa.repository.JpaRepository;
+import hyundai_4th.car_service.model.entity.User;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User_Signup, UUID> {
-    Optional<User_Signup> findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByEmail(String email);
+    Optional<User> findByEmail(String email);
 }

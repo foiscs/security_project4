@@ -23,7 +23,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserResponse getById(@PathVariable String userId) {
-        return userService.getById(UUID.fromString(userId));
+        return userService.getById(userId);
     }
 
     @GetMapping
@@ -34,6 +34,6 @@ public class UserController {
     @PatchMapping("/{userId}")
     public UserResponse update(@PathVariable String userId,
                                @RequestBody UserRequest req) {
-        return userService.update(UUID.fromString(userId), req);
+        return userService.update((userId), req);
     }
 }

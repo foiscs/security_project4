@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "rentals",
-       uniqueConstraints = {
-           @UniqueConstraint(columnNames = {"rental_id", "user_id"})
-       },
-       indexes = {
-           @Index(name = "idx_rent_user_start", columnList = "user_id, start_actual")
-       })
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"rental_id", "user_id"})
+        },
+        indexes = {
+                @Index(name = "idx_rent_user_start", columnList = "user_id, start_actual")
+        })
 public class Rental {
 
     @Id

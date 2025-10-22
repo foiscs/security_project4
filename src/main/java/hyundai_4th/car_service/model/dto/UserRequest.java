@@ -4,8 +4,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 
 public class UserRequest {
-
-    // 생성 시 필수, 수정 시 선택 → 서비스에서 필수값 수동 확인
     @Email
     @Size(max = 320)
     private String email;

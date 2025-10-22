@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/vehicles")
+//@RequestMapping("/api/v1/vehicles")
 public class SearchController {
 
     private final SearchService searchService;
@@ -21,7 +21,7 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<SearchVehicle>> searchVehicles(
             @RequestParam(name = "available_from") String availableFromStr,
             @RequestParam(name = "available_to") String availableToStr,

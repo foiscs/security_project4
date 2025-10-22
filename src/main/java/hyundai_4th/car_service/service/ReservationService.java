@@ -2,7 +2,10 @@ package hyundai_4th.car_service.service;
 
 import hyundai_4th.car_service.model.dto.ReservationRequest;
 import hyundai_4th.car_service.model.dto.ReservationResponse;
-import hyundai_4th.car_service.model.entity.*;
+import hyundai_4th.car_service.model.entity.Reservation;
+import hyundai_4th.car_service.model.entity.Location;
+import hyundai_4th.car_service.model.entity.User;
+
 import hyundai_4th.car_service.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import hyundai_4th.car_service.model.entity.Vehicle;
+
 
 /**
  * 예약 관리 Service
@@ -43,7 +49,8 @@ public class ReservationService {
     public ReservationResponse createReservation(ReservationRequest request) {
         // 1. 사용자 조회
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + request.getUserId()));
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
 
         // 2. 차량 조회
         Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())

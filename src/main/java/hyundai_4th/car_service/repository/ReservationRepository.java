@@ -24,12 +24,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
 
     // 특정 차량의 특정 기간 예약 조회 (예약 충돌 확인용)
     @Query("SELECT r FROM Reservation r WHERE r.vehicle.vehicleId = :vehicleId " +
-           "AND r.status IN ('BOOKED', 'CONVERTED') " +
-           "AND ((r.startAt <= :endAt AND r.endAt >= :startAt))")
+            "AND r.status IN ('BOOKED', 'CONVERTED') " +
+            "AND ((r.startAt <= :endAt AND r.endAt >= :startAt))")
     List<Reservation> findConflictingReservations(
-        @Param("vehicleId") String vehicleId,
-        @Param("startAt") LocalDateTime startAt,
-        @Param("endAt") LocalDateTime endAt
+            @Param("vehicleId") String vehicleId,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
     );
 
     // 특정 기간의 예약 조회

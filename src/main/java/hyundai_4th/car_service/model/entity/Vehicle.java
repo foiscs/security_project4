@@ -14,26 +14,26 @@ public class Vehicle {
     private String vehicleId;
 
     @Column(name = "vin", length = 64, unique = true, nullable = false)
-    private String vin;  // 차대번호 (Vehicle Identification Number)
+    private String vin;
 
     @Column(name = "plate", length = 32, unique = true, nullable = false)
-    private String plate;  // 번호판
+    private String plate;
 
     @Column(name = "model", length = 80, nullable = false)
-    private String model;  // 모델명 (예: "소나타")
+    private String model;
 
     @Column(name = "brand", length = 80, nullable = false)
-    private String brand;  // 브랜드 (예: "현대")
+    private String brand;
 
     @Column(name = "year", nullable = false)
-    private Integer year;  // 연식
+    private Integer year;
 
     @Column(name = "status", length = 20, nullable = false)
-    private String status = "available";  // 기본값: available
+    private String status = "available";
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_location_id", nullable = false)
-    private Location currentLocation;  // 현재 위치
+    private Location currentLocation;
 
     // 기본 생성자
     public Vehicle() {
