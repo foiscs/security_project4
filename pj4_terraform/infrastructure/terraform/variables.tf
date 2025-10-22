@@ -942,18 +942,12 @@ variable "application_port" {
 }
 
 
-<<<<<<< Updated upstream
-# 소스 AMI ID 입력
-variable "source_ami_id_use1" {
-  type = string
-  default = "ami-03b0345dae9dfe6eb"
-=======
+
 # 소스 AMI ID 입력 (OVA에서 변환된 서울 리전의 커스텀 AMI)
 variable "web_ami_id" {
   type        = string
   default     = "ami-09e629c5db47cb756"
   description = "Custom AMI converted from OVA in Seoul region"
->>>>>>> Stashed changes
 }
 
 
