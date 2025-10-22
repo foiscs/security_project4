@@ -3035,3 +3035,69 @@ Caused by: org.hibernate.QueryException: could not resolve property: currentLoca
 2025-10-22 12:52:11.698 DEBUG 29192 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/index.html", parameters={}
 2025-10-22 12:52:11.702 DEBUG 29192 --- [http-nio-8080-exec-4] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
 2025-10-22 12:52:11.713 DEBUG 29192 --- [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-10-22 13:11:50.875  INFO 18276 --- [main] h.car_service.CarServiceApplication      : Starting CarServiceApplication using Java 17.0.15 on nyang07 with PID 18276 (D:\Github\4th_project\hyundai_project4\build\classes\java\main started by koyeh in D:\Github\4th_project\hyundai_project4)
+2025-10-22 13:11:50.879  INFO 18276 --- [main] h.car_service.CarServiceApplication      : No active profile set, falling back to default profiles: default
+2025-10-22 13:11:51.641  INFO 18276 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-22 13:11:51.801  INFO 18276 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 147 ms. Found 8 JPA repository interfaces.
+2025-10-22 13:11:53.212  INFO 18276 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2025-10-22 13:11:53.223  INFO 18276 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-10-22 13:11:53.223  INFO 18276 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.56]
+2025-10-22 13:11:53.333  INFO 18276 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-10-22 13:11:53.333  INFO 18276 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2399 ms
+2025-10-22 13:11:53.490 DEBUG 18276 --- [main] o.springframework.web.filter.CorsFilter  : Filter 'corsFilter' configured for use
+2025-10-22 13:11:53.742  INFO 18276 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-22 13:11:53.835  INFO 18276 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.3.Final
+2025-10-22 13:11:54.148  INFO 18276 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-10-22 13:11:54.337  INFO 18276 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-22 13:11:54.949  INFO 18276 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-22 13:11:54.966  INFO 18276 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2025-10-22 13:11:56.156  INFO 18276 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-10-22 13:11:56.171  INFO 18276 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-22 13:11:57.855  INFO 18276 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@28551755, org.springframework.security.web.context.SecurityContextPersistenceFilter@310cc4d, org.springframework.security.web.header.HeaderWriterFilter@531292ed, org.springframework.web.filter.CorsFilter@2489e84a, org.springframework.security.web.csrf.CsrfFilter@5c40402c, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4a1c14a6, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1bc1aa9e, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7ec68821, org.springframework.security.web.session.SessionManagementFilter@1360ef8d, org.springframework.security.web.access.ExceptionTranslationFilter@2da0770, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@6fa2d0b2]
+2025-10-22 13:11:57.930  WARN 18276 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 13:11:58.078 DEBUG 18276 --- [main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-10-22 13:11:58.220 DEBUG 18276 --- [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 37 mappings in 'requestMappingHandlerMapping'
+2025-10-22 13:11:58.221  INFO 18276 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-10-22 13:11:58.267 DEBUG 18276 --- [main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-10-22 13:11:58.283 DEBUG 18276 --- [main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-10-22 13:11:58.459  INFO 18276 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2025-10-22 13:11:58.474  INFO 18276 --- [main] h.car_service.CarServiceApplication      : Started CarServiceApplication in 8.046 seconds (JVM running for 8.605)
+2025-10-22 13:12:04.481  INFO 18276 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-10-22 13:12:04.481  INFO 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-10-22 13:12:04.481 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2025-10-22 13:12:04.481 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2025-10-22 13:12:04.481 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2025-10-22 13:12:04.481 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@a0e35c3
+2025-10-22 13:12:04.482 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@70a91d72
+2025-10-22 13:12:04.482 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-10-22 13:12:04.482  INFO 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-10-22 13:12:04.522 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/rental_api.html", parameters={}
+2025-10-22 13:12:04.534 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2025-10-22 13:12:04.548 DEBUG 18276 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2025-10-22 13:39:36.488  WARN 18276 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=21m11s336ms626µs400ns).
+2025-10-22 13:56:08.155  WARN 18276 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m1s615ms849µs400ns).
+2025-10-22 14:27:33.639  INFO 6648 --- [Test worker] h.c.CarServiceApplicationTests           : Starting CarServiceApplicationTests using Java 17.0.16 on nyang07 with PID 6648 (started by koyeh in D:\Github\4th_project\hyundai_project4)
+2025-10-22 14:27:33.639  INFO 6648 --- [Test worker] h.c.CarServiceApplicationTests           : No active profile set, falling back to default profiles: default
+2025-10-22 14:27:33.658 DEBUG 6648 --- [Test worker] o.s.w.c.s.GenericWebApplicationContext   : Refreshing org.springframework.web.context.support.GenericWebApplicationContext@60f2e0bd
+2025-10-22 14:27:34.348  INFO 6648 --- [Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-10-22 14:27:34.433  INFO 6648 --- [Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 76 ms. Found 8 JPA repository interfaces.
+2025-10-22 14:27:35.083  INFO 6648 --- [Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-10-22 14:27:35.149  INFO 6648 --- [Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.3.Final
+2025-10-22 14:27:35.321  INFO 6648 --- [Test worker] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-10-22 14:27:35.415  INFO 6648 --- [Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-10-22 14:27:35.718  INFO 6648 --- [Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-10-22 14:27:35.738  INFO 6648 --- [Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2025-10-22 14:27:36.543  INFO 6648 --- [Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-10-22 14:27:36.548  INFO 6648 --- [Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-10-22 14:27:37.989  INFO 6648 --- [Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@690c3b1f, org.springframework.security.web.context.SecurityContextPersistenceFilter@307e9c02, org.springframework.security.web.header.HeaderWriterFilter@1677f98b, org.springframework.web.filter.CorsFilter@7e2f16bd, org.springframework.security.web.csrf.CsrfFilter@6c569caf, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@37922937, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@73483d4b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1d722bff, org.springframework.security.web.session.SessionManagementFilter@550e7ef6, org.springframework.security.web.access.ExceptionTranslationFilter@202fd4c4, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@108fd5d5]
+2025-10-22 14:27:38.313  WARN 6648 --- [Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 14:27:38.499 DEBUG 6648 --- [Test worker] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-10-22 14:27:38.608 DEBUG 6648 --- [Test worker] s.w.s.m.m.a.RequestMappingHandlerMapping : 37 mappings in 'requestMappingHandlerMapping'
+2025-10-22 14:27:38.608  INFO 6648 --- [Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-10-22 14:27:38.694 DEBUG 6648 --- [Test worker] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2025-10-22 14:27:38.710 DEBUG 6648 --- [Test worker] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-10-22 14:27:38.877  INFO 6648 --- [Test worker] h.c.CarServiceApplicationTests           : Started CarServiceApplicationTests in 5.52 seconds (JVM running for 6.846)
+2025-10-22 14:27:39.115 DEBUG 6648 --- [SpringApplicationShutdownHook] o.s.w.c.s.GenericWebApplicationContext   : Closing org.springframework.web.context.support.GenericWebApplicationContext@60f2e0bd, started on Wed Oct 22 14:27:33 KST 2025
+2025-10-22 14:27:39.122  INFO 6648 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-22 14:27:39.125  INFO 6648 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-10-22 14:27:39.137  INFO 6648 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
