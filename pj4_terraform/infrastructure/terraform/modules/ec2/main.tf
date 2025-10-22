@@ -5,7 +5,25 @@ resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
   image_id      = var.web_ami_id
   instance_type = "t3.micro"
+  update_default_version = true 
   vpc_security_group_ids = [aws_security_group.web.id]
+
+  # 인스턴스 프로파일 추가
+  iam_instance_profile { name = aws_iam_instance_profile.web.name }
+
+  # User data(base64 인코딩 필수)
+  user_data = base64encode(templatefile("${path.module}/user_data_web.sh", {
+    app       = var.project_name
+    port      = var.application_port
+    region    = var.aws_region
+    gh_org    = var.gh_org
+    gh_repo   = var.gh_repo
+    gh_tag    = var.gh_tag
+    gh_asset  = var.gh_asset
+    ssm_param = var.ssm_github_token_param
+  }))
+
+
   tag_specifications {
     resource_type = "instance"
     tags = merge(var.common_tags, {
@@ -24,20 +42,16 @@ resource "aws_autoscaling_group" "web" {
   vpc_zone_identifier       = var.private_subnet_ids
   launch_template {
     id      = aws_launch_template.web.id
-    version = "$Latest"
+    version = aws_launch_template.web.latest_version
   }
   instance_refresh {
     strategy  = "Rolling"
-    triggers  = ["launch_template"]   # LT 변경 시 자동 롤링
-    preferences {
-      min_healthy_percentage = 90
-      instance_warmup        = 60
-    }
+    triggers  = ["launch_template"]
   }
   target_group_arns = [aws_lb_target_group.web.arn] 
   tag {
-    key                 = "Name"
-    value               = "${var.project_name}-web"
+    key                 = "launch_version"
+    value               = "aws_launch_template.web.latest_version"
     propagate_at_launch = true
   }
   dynamic "tag" {
@@ -254,3 +268,105 @@ resource "aws_lb_listener" "web" {
     Component = "LoadBalancer"
   })
 }
+
+
+# === EC2가 SSM SecureString을 읽기 위한 최소 IAM 구성 ===
+data "aws_caller_identity" "cur" {}
+
+# instance_profile_name 없으면 생성, 있으면 재사용
+locals {
+  create_ip = var.instance_profile_name == null
+}
+
+data "aws_iam_policy_document" "ec2_trust" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals { 
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"] 
+    }
+  }
+}
+
+resource "aws_iam_role" "web" {
+  name               = "${var.project_name}-web-role"
+  assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
+}
+
+# /github/token 읽기 권한
+locals {
+  ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
+}
+
+data "aws_iam_policy_document" "ssm_read" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = [local.ssm_param_arn]
+  }
+  # (고객관리 KMS로 암호화했다면 kms:Decrypt도 추가 필요)
+}
+
+resource "aws_iam_policy" "ssm_read" {
+  name   = "${var.project_name}-web-ssm-read"
+  policy = data.aws_iam_policy_document.ssm_read.json
+}
+
+
+# 세션 매니저/RunCommand용
+resource "aws_iam_role_policy_attachment" "attach_ssm_core" {
+  role       = aws_iam_role.web.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "web" {
+  name  = "${var.project_name}-web-profile"
+  role  = aws_iam_role.web.name
+}
+
+# 최종 LT에 연결할 인스턴스 프로파일 이름
+locals {
+  resolved_instance_profile = local.create_ip ? aws_iam_instance_profile.web.name : var.instance_profile_name
+}
+
+
+# =========================================
+# EC2가 사용할 역할 (s3)
+# =========================================
+# data "aws_iam_policy_document" "ec2_trust" {
+#   statement {
+#     effect = "Allow"
+#     principals { type = "Service", identifiers = ["ec2.amazonaws.com"] }
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
+# resource "aws_iam_role" "web" {
+#   name               = "${var.project_name}-web-role"
+#   assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
+# }
+
+# S3 특정 버킷/프리픽스 읽기 전용
+# data "aws_iam_policy_document" "web_s3_read" {
+#   statement {
+#     actions   = ["s3:GetObject","s3:ListBucket"]
+#     resources = [
+#       "arn:aws:s3:::${var.service_bucket}",
+#       "arn:aws:s3:::${var.service_bucket}/*",
+#     ]
+#   }
+# }
+# resource "aws_iam_policy" "web_s3_read" {
+#   name   = "${var.project_name}-web-s3-read"
+#   policy = data.aws_iam_policy_document.web_s3_read.json
+# }
+# resource "aws_iam_role_policy_attachment" "web_s3_read" {
+#   role       = aws_iam_role.web.name
+#   policy_arn = aws_iam_policy.web_s3_read.arn
+# }
+
+# resource "aws_iam_instance_profile" "web" {
+#   name = "${var.project_name}-web-profile"
+#   role = aws_iam_role.web.name
+# }
+
+
