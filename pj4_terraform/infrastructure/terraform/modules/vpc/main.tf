@@ -257,3 +257,37 @@ resource "aws_iam_role_policy" "flow_log" {
     ]
   })
 }
+
+
+# =========================================
+# vpc peering
+# =========================================
+
+data "aws_vpc" "SIEM-VPC" { id = var.peer_vpc_id } 
+
+
+resource "aws_vpc_peering_connection" "pcx" {
+  vpc_id      = aws_vpc.main.id
+  peer_vpc_id = data.aws_vpc.SIEM-VPC.id
+  auto_accept = true
+  tags = {
+    Name = "${var.project_name}-vpc-peering"
+  }
+}
+
+
+# Add VPC Peering Route
+resource "aws_route" "private_to_peer" {
+  count                      = length(var.private_subnet_cidrs)
+  route_table_id             = aws_route_table.private[count.index].id
+  destination_cidr_block     = data.aws_vpc.SIEM-VPC.cidr_block
+  vpc_peering_connection_id  = aws_vpc_peering_connection.pcx.id
+}
+
+#  Add VPC Peering Route - peer vpc(splunk)는 terraform으로 관리하지 않으므로 콘솔에서 수동으로 splunk vpc route table에 추가 필요
+# resource "aws_route" "b_to_a" {
+#   route_table_id            = aws_vpc.peer.default_route_table_id # 현재 VPC의 라우팅 테이블 ID
+#   destination_cidr_block    = aws_vpc.main.cidr_block # 대상 VPC의 CIDR 블록
+#   vpc_peering_connection_id = aws_vpc_peering_connection.pcx.id # VPC 피어링 연결 ID
+# }
+

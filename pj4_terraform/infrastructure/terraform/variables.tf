@@ -913,7 +913,7 @@ variable "application_port" {
 # 소스 AMI ID 입력 (OVA에서 변환된 서울 리전의 커스텀 AMI)
 variable "web_ami_id" {
   type        = string
-  default     = "ami-09e629c5db47cb756"
+  default     = "ami-0e9c46d6a4ead333d"
   description = "Custom AMI converted from OVA in Seoul region"
 }
 
