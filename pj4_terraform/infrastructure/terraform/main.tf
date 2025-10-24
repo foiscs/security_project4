@@ -15,6 +15,8 @@ module "ec2"{
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
   web_ami_id          = var.web_ami_id  # 서울 리전에 변환된 커스텀 AMI 사용
+  service_bucket_arn  = module.s3.service_bucket_arn
+  service_bucket_kms_arn = module.s3.kms_key_arn
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })

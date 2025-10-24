@@ -92,14 +92,14 @@ variable "rds_instance_class" {
 variable "db_name" {
   description = "데이터베이스 이름"
   type        = string
-  default     = "WALB_DB"
+  default     = "appdb"
 }
 
 
 variable "db_username" {
   description = "데이터베이스 사용자명"
   type        = string
-  default     = "dbadmin"
+  default     = "admin"
 }
 
 

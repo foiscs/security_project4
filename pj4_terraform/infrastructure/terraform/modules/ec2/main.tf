@@ -1,5 +1,6 @@
 # infrastructure/terraform/modules/ec2/main.tf
 
+
 # Launch Template for web ASG
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
@@ -291,9 +292,17 @@ data "aws_iam_policy_document" "ec2_trust" {
 resource "aws_iam_role" "web" {
   name               = "${var.project_name}-web-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
+  tags               = var.common_tags
 }
 
 # /github/token 읽기 권한
+# locals {
+#   ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
+# }
+
+
+
+# SSM SecureString(/github/token 등) 읽기 (필요하면 남기고, 안쓰면 제거)
 locals {
   ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
 }
@@ -304,7 +313,6 @@ data "aws_iam_policy_document" "ssm_read" {
     actions   = ["ssm:GetParameter"]
     resources = [local.ssm_param_arn]
   }
-  # (고객관리 KMS로 암호화했다면 kms:Decrypt도 추가 필요)
 }
 
 resource "aws_iam_policy" "ssm_read" {
@@ -312,6 +320,11 @@ resource "aws_iam_policy" "ssm_read" {
   policy = data.aws_iam_policy_document.ssm_read.json
 }
 
+# SSM 세션/RunCommand 표준 권한
+resource "aws_iam_role_policy_attachment" "ssm_read_attach" {
+  role       = aws_iam_role.web.name
+  policy_arn = aws_iam_policy.ssm_read.arn
+}
 
 # 세션 매니저/RunCommand용
 resource "aws_iam_role_policy_attachment" "attach_ssm_core" {
@@ -319,10 +332,6 @@ resource "aws_iam_role_policy_attachment" "attach_ssm_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "web" {
-  name  = "${var.project_name}-web-profile"
-  role  = aws_iam_role.web.name
-}
 
 # 최종 LT에 연결할 인스턴스 프로파일 이름
 locals {
@@ -333,40 +342,49 @@ locals {
 # =========================================
 # EC2가 사용할 역할 (s3)
 # =========================================
-# data "aws_iam_policy_document" "ec2_trust" {
-#   statement {
-#     effect = "Allow"
-#     principals { type = "Service", identifiers = ["ec2.amazonaws.com"] }
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
-# resource "aws_iam_role" "web" {
-#   name               = "${var.project_name}-web-role"
-#   assume_role_policy = data.aws_iam_policy_document.ec2_trust.json
-# }
 
 # S3 특정 버킷/프리픽스 읽기 전용
-# data "aws_iam_policy_document" "web_s3_read" {
-#   statement {
-#     actions   = ["s3:GetObject","s3:ListBucket"]
-#     resources = [
-#       "arn:aws:s3:::${var.service_bucket}",
-#       "arn:aws:s3:::${var.service_bucket}/*",
-#     ]
-#   }
-# }
-# resource "aws_iam_policy" "web_s3_read" {
-#   name   = "${var.project_name}-web-s3-read"
-#   policy = data.aws_iam_policy_document.web_s3_read.json
-# }
-# resource "aws_iam_role_policy_attachment" "web_s3_read" {
-#   role       = aws_iam_role.web.name
-#   policy_arn = aws_iam_policy.web_s3_read.arn
-# }
-
-# resource "aws_iam_instance_profile" "web" {
-#   name = "${var.project_name}-web-profile"
-#   role = aws_iam_role.web.name
-# }
+data "aws_iam_policy_document" "web_s3_read" {
+  statement {
+    actions   = ["s3:GetObject","s3:ListBucket"]
+    resources = [
+      "${var.service_bucket_arn}",
+      "${var.service_bucket_arn}/*",
+    ]
+  }
+}
+resource "aws_iam_policy" "web_s3_read" {
+  name   = "${var.project_name}-web-s3-read"
+  policy = data.aws_iam_policy_document.web_s3_read.json
+}
+resource "aws_iam_role_policy_attachment" "web_s3_read_attach" {
+  role       = aws_iam_role.web.name
+  policy_arn = aws_iam_policy.web_s3_read.arn
+}
 
 
+
+data "aws_iam_policy_document" "web_kms_use" {
+  statement {
+    actions   = ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey*"]
+    resources = [
+      "${var.service_bucket_kms_arn}",
+      "${var.service_bucket_kms_arn}/*",
+    ]
+  }
+}
+resource "aws_iam_policy" "web_kms_use" {
+  name   = "${var.project_name}-web-kms-use"
+  policy = data.aws_iam_policy_document.web_kms_use.json
+}
+resource "aws_iam_role_policy_attachment" "web_kms_use_attach" {
+  role       = aws_iam_role.web.name
+  policy_arn = aws_iam_policy.web_kms_use.arn
+}
+
+
+# Instance Profile (LT에 붙일 것)
+resource "aws_iam_instance_profile" "web" {
+  name = "${var.project_name}-web-profile"
+  role = aws_iam_role.web.name
+}
