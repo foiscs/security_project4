@@ -167,27 +167,27 @@ module "rds" {
 # S3 Module - for service
 # =========================================
 
-# module "s3" {
-#   source = "./modules/s3"
+module "s3" {
+  source = "./modules/s3"
 
-#   # 필수
-#   project_name = var.project_name          # 예: "dev-app"
-#   environment  = var.environment           # 예: "dev" | "staging" | "prod"
+  # 필수
+  project_name = var.project_name          # 예: "dev-app"
+  environment  = var.environment           # 예: "dev" | "staging" | "prod"
 
-#   # 권장 기본값들
-#   force_destroy       = false              # 운영용이면 false 권장
-#   create_kms_key      = true               # 모듈이 KMS Key & Alias 생성
-#   enable_versioning   = true
-#   log_retention_days  = 365                # ISMS-P 최소 365
-#   transition_to_ia_days           = 30
-#   transition_to_glacier_days      = 90
-#   transition_to_deep_archive_days = 180
+  # 권장 기본값들
+  force_destroy       = false              # 운영용이면 false 권장
+  create_kms_key      = true               # 모듈이 KMS Key & Alias 생성
+  enable_versioning   = true
+  log_retention_days  = 365                # ISMS-P 최소 365
+  transition_to_ia_days           = 30
+  transition_to_glacier_days      = 90
+  transition_to_deep_archive_days = 180
 
-#   # 태그
-#   common_tags = merge(var.common_tags, {
-#     Component = "S3"
-#   })
-# }
+  # 태그
+  common_tags = merge(var.common_tags, {
+    Component = "S3"
+  })
+}
 
 
 # =========================================

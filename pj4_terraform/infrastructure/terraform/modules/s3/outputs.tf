@@ -3,74 +3,26 @@
 
 # S3 모듈 출력값 정의
 
-
 # 로그 버킷 정보
-output "logs_bucket_id" {
-  description = "로그 버킷 ID"
-  value       = aws_s3_bucket.logs.id
+output "service_bucket_id" {
+  description = "서비스 버킷 ID"
+  value       = aws_s3_bucket.service.id
 }
 
-output "logs_bucket_arn" {
-  description = "로그 버킷 ARN"
-  value       = aws_s3_bucket.logs.arn
-
-}
-output "logs_bucket_domain_name" {
-  description = "로그 버킷 도메인 이름"
-  value       = aws_s3_bucket.logs.bucket_domain_name
-}
-
-output "logs_bucket_regional_domain_name" {
-  description = "로그 버킷 리전별 도메인 이름"
-  value       = aws_s3_bucket.logs.bucket_regional_domain_name
+output "service_bucket_arn" {
+  description = "서비스 버킷 ARN"
+  value       = aws_s3_bucket.service.arn
 }
 
 
-# 아티팩트 버킷 정보
-output "artifacts_bucket_id" {
-  description = "아티팩트 버킷 ID"
-  value       = var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].id : null
+output "service_bucket_domain_name" {
+  description = "서비스 버킷 도메인 이름"
+  value       = aws_s3_bucket.service.bucket_domain_name
 }
 
-output "artifacts_bucket_arn" {
-  description = "아티팩트 버킷 ARN"
-  value       = var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].arn : null
-}
-
-output "artifacts_bucket_domain_name" {
-  description = "아티팩트 버킷 도메인 이름"
-  value       = var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].bucket_domain_name : null
-}
-
-
-
-# 백업 버킷 정보
-output "backups_bucket_id" {
-  description = "백업 버킷 ID"
-  value       = var.create_backups_bucket ? aws_s3_bucket.backups[0].id : null
-}
-
-output "backups_bucket_arn" {
-  description = "백업 버킷 ARN"
-  value       = var.create_backups_bucket ? aws_s3_bucket.backups[0].arn : null
-}
-
-output "backups_bucket_domain_name" {
-  description = "백업 버킷 도메인 이름"
-  value       = var.create_backups_bucket ? aws_s3_bucket.backups[0].bucket_domain_name : null
-}
-
-
-
-# 액세스 로그 버킷 정보
-output "access_logs_bucket_id" {
-  description = "액세스 로그 버킷 ID"
-  value       = var.enable_access_logging ? aws_s3_bucket.access_logs[0].id : null
-}
-
-output "access_logs_bucket_arn" {
-  description = "액세스 로그 버킷 ARN"
-  value       = var.enable_access_logging ? aws_s3_bucket.access_logs[0].arn : null
+output "service_bucket_regional_domain_name" {
+  description = "서비스 버킷 리전별 도메인 이름"
+  value       = aws_s3_bucket.service.bucket_regional_domain_name
 }
 
 
@@ -92,46 +44,12 @@ output "kms_alias_name" {
 }
 
 
-
-# 버킷 이름 목록 (다른 서비스에서 참조용)
-output "bucket_names" {
-  description = "생성된 모든 버킷 이름 목록"
-  value = compact([
-    aws_s3_bucket.logs.id,
-    var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].id : "",
-    var.create_backups_bucket ? aws_s3_bucket.backups[0].id : "",
-    var.enable_access_logging ? aws_s3_bucket.access_logs[0].id : ""
-  ])
-}
-
-output "bucket_arns" {
-  description = "생성된 모든 버킷 ARN 목록"
-  value = compact([
-    aws_s3_bucket.logs.arn,
-    var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].arn : "",
-    var.create_backups_bucket ? aws_s3_bucket.backups[0].arn : "",
-    var.enable_access_logging ? aws_s3_bucket.access_logs[0].arn : ""
-  ])
-}
-
-
 # CloudTrail용 설정 정보
 output "cloudtrail_s3_config" {
   description = "CloudTrail S3 설정 정보"
   value = {
-    bucket_name = aws_s3_bucket.logs.id
+    bucket_name = aws_s3_bucket.service.id
     prefix      = "cloudtrail"
-    kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
-  }
-}
-
-
-# VPC Flow Logs용 설정 정보
-output "vpc_flow_logs_s3_config" {
-  description = "VPC Flow Logs S3 설정 정보"
-  value = {
-    bucket_name = aws_s3_bucket.logs.id
-    prefix      = "vpc-flow-logs"
     kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
   }
 }
@@ -141,40 +59,8 @@ output "vpc_flow_logs_s3_config" {
 output "aws_config_s3_config" {
   description = "AWS Config S3 설정 정보"
   value = {
-    bucket_name = aws_s3_bucket.logs.id
+    bucket_name = aws_s3_bucket.service.id
     prefix      = "aws-config"
-    kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
-  }
-}
-
-# GuardDuty용 설정 정보
-output "guardduty_s3_config" {
-  description = "GuardDuty S3 설정 정보"
-  value = {
-    bucket_name = aws_s3_bucket.logs.id
-    prefix      = "guardduty"
-    kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
-  }
-}
-
-
-# Security Hub용 설정 정보
-output "security_hub_s3_config" {
-  description = "Security Hub S3 설정 정보"
-  value = {
-    bucket_name = aws_s3_bucket.logs.id
-    prefix      = "security-hub"
-    kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
-  }
-}
-
-
-# CloudWatch Logs 내보내기용 설정
-output "cloudwatch_logs_export_config" {
-  description = "CloudWatch Logs 내보내기 S3 설정"
-  value = {
-    bucket_name = aws_s3_bucket.logs.id
-    prefix      = "cloudwatch-logs"
     kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
   }
 }
@@ -208,7 +94,10 @@ output "security_configuration" {
 }
 
 
+
+
 # 모니터링 설정 정보
+
 output "monitoring_configuration" {
   description = "S3 모니터링 설정 정보"
   value = {
@@ -232,7 +121,6 @@ output "performance_configuration" {
     multipart_chunk_size_mb      = var.multipart_upload_chunk_size
   }
 }
-
 
 
 # CORS 설정 정보
@@ -270,7 +158,6 @@ output "replication_configuration" {
 }
 
 
-
 # 컴플라이언스 정보
 output "compliance_info" {
   description = "컴플라이언스 관련 정보"
@@ -285,32 +172,6 @@ output "compliance_info" {
 }
 
 
-
-# CloudWatch 알람 정보
-output "cloudwatch_alarms" {
-  description = "생성된 CloudWatch 알람 정보"
-  value = var.enable_cloudwatch_monitoring ? [
-    for alarm in aws_cloudwatch_metric_alarm.s3_bucket_size :
-    {
-      name      = alarm.alarm_name
-      threshold = alarm.threshold
-      metric    = alarm.metric_name
-    }
-  ] : []
-}
-
-
-# 이벤트 알림 설정
-output "event_notification_config" {
-  description = "S3 이벤트 알림 설정"
-  value = {
-    eventbridge_enabled   = var.enable_cloudwatch_events
-    sqs_queue_arn        = var.sqs_queue_arn
-  }
-}
-
-
-
 # 비용 최적화 정보
 output "cost_optimization_info" {
   description = "비용 최적화 설정 정보"
@@ -323,39 +184,14 @@ output "cost_optimization_info" {
 }
 
 
-
-# 백업 관련 정보
-output "backup_configuration" {
-  description = "백업 관련 설정 정보"
-  value = {
-    backup_bucket_created     = var.create_backups_bucket
-    cross_account_backup     = var.enable_cross_account_backup
-    backup_account_id        = var.backup_account_id
-    backup_retention_days    = var.backup_retention_days
-    versioning_enabled       = var.enable_versioning
-  }
-}
-
-
-
 # 접근 경로 정보
 output "s3_access_paths" {
   description = "S3 버킷 접근 경로 정보"
   value = {
-    logs_bucket = {
-      console_url = "https://s3.console.aws.amazon.com/s3/buckets/${aws_s3_bucket.logs.id}"
-      s3_uri      = "s3://${aws_s3_bucket.logs.id}"
-      https_url   = "https://${aws_s3_bucket.logs.bucket_domain_name}"
+    service_bucket = {
+      console_url = "https://s3.console.aws.amazon.com/s3/buckets/${aws_s3_bucket.service.id}"
+      s3_uri      = "s3://${aws_s3_bucket.service.id}"
+      https_url   = "https://${aws_s3_bucket.service.bucket_domain_name}"
     }
-    artifacts_bucket = var.create_artifacts_bucket ? {
-      console_url = "https://s3.console.aws.amazon.com/s3/buckets/${aws_s3_bucket.artifacts[0].id}"
-      s3_uri      = "s3://${aws_s3_bucket.artifacts[0].id}"
-      https_url   = "https://${aws_s3_bucket.artifacts[0].bucket_domain_name}"
-    } : null
-    backups_bucket = var.create_backups_bucket ? {
-      console_url = "https://s3.console.aws.amazon.com/s3/buckets/${aws_s3_bucket.backups[0].id}"
-      s3_uri      = "s3://${aws_s3_bucket.backups[0].id}"
-      https_url   = "https://${aws_s3_bucket.backups[0].bucket_domain_name}"
-    } : null
   }
 }
