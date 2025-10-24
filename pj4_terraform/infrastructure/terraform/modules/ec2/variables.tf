@@ -124,3 +124,16 @@ variable "instance_profile_name" {
   type        = string
   default     = null
 }
+
+variable "service_bucket_arn"{
+  description = "서비스 올려놓은 s3 bucket"
+  type        = string
+  default     = null
+}
+
+
+variable "service_bucket_kms_arn" {
+  description = "s3 kms arn (ec2에 접근 권한 주기 위해)"
+  type        = string
+  default     = "arn:aws:kms:ap-northeast-2:253157413163:key/6b08cc4b-1d12-43b7-abbb-d4fe2db6b49f"
+}
