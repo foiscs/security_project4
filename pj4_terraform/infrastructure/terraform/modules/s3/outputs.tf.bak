@@ -1,5 +1,8 @@
 # infrastructure/terraform/modules/s3/outputs.tf
+
+
 # S3 모듈 출력값 정의
+
 
 # 로그 버킷 정보
 output "logs_bucket_id" {
@@ -10,8 +13,8 @@ output "logs_bucket_id" {
 output "logs_bucket_arn" {
   description = "로그 버킷 ARN"
   value       = aws_s3_bucket.logs.arn
-}
 
+}
 output "logs_bucket_domain_name" {
   description = "로그 버킷 도메인 이름"
   value       = aws_s3_bucket.logs.bucket_domain_name
@@ -21,6 +24,7 @@ output "logs_bucket_regional_domain_name" {
   description = "로그 버킷 리전별 도메인 이름"
   value       = aws_s3_bucket.logs.bucket_regional_domain_name
 }
+
 
 # 아티팩트 버킷 정보
 output "artifacts_bucket_id" {
@@ -38,6 +42,8 @@ output "artifacts_bucket_domain_name" {
   value       = var.create_artifacts_bucket ? aws_s3_bucket.artifacts[0].bucket_domain_name : null
 }
 
+
+
 # 백업 버킷 정보
 output "backups_bucket_id" {
   description = "백업 버킷 ID"
@@ -54,6 +60,8 @@ output "backups_bucket_domain_name" {
   value       = var.create_backups_bucket ? aws_s3_bucket.backups[0].bucket_domain_name : null
 }
 
+
+
 # 액세스 로그 버킷 정보
 output "access_logs_bucket_id" {
   description = "액세스 로그 버킷 ID"
@@ -64,6 +72,8 @@ output "access_logs_bucket_arn" {
   description = "액세스 로그 버킷 ARN"
   value       = var.enable_access_logging ? aws_s3_bucket.access_logs[0].arn : null
 }
+
+
 
 # KMS 키 정보
 output "kms_key_id" {
@@ -80,6 +90,8 @@ output "kms_alias_name" {
   description = "S3 KMS 키 별칭"
   value       = var.create_kms_key ? aws_kms_alias.s3[0].name : null
 }
+
+
 
 # 버킷 이름 목록 (다른 서비스에서 참조용)
 output "bucket_names" {
@@ -102,6 +114,7 @@ output "bucket_arns" {
   ])
 }
 
+
 # CloudTrail용 설정 정보
 output "cloudtrail_s3_config" {
   description = "CloudTrail S3 설정 정보"
@@ -112,6 +125,7 @@ output "cloudtrail_s3_config" {
   }
 }
 
+
 # VPC Flow Logs용 설정 정보
 output "vpc_flow_logs_s3_config" {
   description = "VPC Flow Logs S3 설정 정보"
@@ -121,6 +135,7 @@ output "vpc_flow_logs_s3_config" {
     kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
   }
 }
+
 
 # AWS Config용 설정 정보
 output "aws_config_s3_config" {
@@ -142,6 +157,7 @@ output "guardduty_s3_config" {
   }
 }
 
+
 # Security Hub용 설정 정보
 output "security_hub_s3_config" {
   description = "Security Hub S3 설정 정보"
@@ -152,6 +168,7 @@ output "security_hub_s3_config" {
   }
 }
 
+
 # CloudWatch Logs 내보내기용 설정
 output "cloudwatch_logs_export_config" {
   description = "CloudWatch Logs 내보내기 S3 설정"
@@ -161,6 +178,7 @@ output "cloudwatch_logs_export_config" {
     kms_key_id  = var.create_kms_key ? aws_kms_key.s3[0].arn : var.kms_key_id
   }
 }
+
 
 # 라이프사이클 정책 정보
 output "lifecycle_policies" {
@@ -173,6 +191,8 @@ output "lifecycle_policies" {
     transition_to_deep_archive_days = var.transition_to_deep_archive_days
   }
 }
+
+
 
 # 보안 설정 정보
 output "security_configuration" {
@@ -187,6 +207,7 @@ output "security_configuration" {
   }
 }
 
+
 # 모니터링 설정 정보
 output "monitoring_configuration" {
   description = "S3 모니터링 설정 정보"
@@ -199,6 +220,8 @@ output "monitoring_configuration" {
   }
 }
 
+
+
 # 성능 설정 정보
 output "performance_configuration" {
   description = "S3 성능 설정 정보"
@@ -210,6 +233,8 @@ output "performance_configuration" {
   }
 }
 
+
+
 # CORS 설정 정보
 output "cors_configuration" {
   description = "CORS 설정 정보"
@@ -218,6 +243,8 @@ output "cors_configuration" {
     rules   = var.cors_rules
   }
 }
+
+
 
 # 웹사이트 호스팅 정보
 output "website_configuration" {
@@ -231,6 +258,7 @@ output "website_configuration" {
   }
 }
 
+
 # 복제 설정 정보
 output "replication_configuration" {
   description = "교차 리전 복제 설정 정보"
@@ -240,6 +268,8 @@ output "replication_configuration" {
     replication_role_arn   = var.replication_role_arn
   }
 }
+
+
 
 # 컴플라이언스 정보
 output "compliance_info" {
@@ -254,6 +284,8 @@ output "compliance_info" {
   }
 }
 
+
+
 # CloudWatch 알람 정보
 output "cloudwatch_alarms" {
   description = "생성된 CloudWatch 알람 정보"
@@ -267,6 +299,7 @@ output "cloudwatch_alarms" {
   ] : []
 }
 
+
 # 이벤트 알림 설정
 output "event_notification_config" {
   description = "S3 이벤트 알림 설정"
@@ -275,6 +308,8 @@ output "event_notification_config" {
     sqs_queue_arn        = var.sqs_queue_arn
   }
 }
+
+
 
 # 비용 최적화 정보
 output "cost_optimization_info" {
@@ -287,6 +322,8 @@ output "cost_optimization_info" {
   }
 }
 
+
+
 # 백업 관련 정보
 output "backup_configuration" {
   description = "백업 관련 설정 정보"
@@ -298,6 +335,8 @@ output "backup_configuration" {
     versioning_enabled       = var.enable_versioning
   }
 }
+
+
 
 # 접근 경로 정보
 output "s3_access_paths" {

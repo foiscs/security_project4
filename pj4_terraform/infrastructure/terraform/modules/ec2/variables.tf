@@ -19,6 +19,12 @@ variable "environment" {
   }
 }
 
+variable "aws_region" {
+  description = "AWS 리전"
+  type        = string
+  default     = "ap-northeast-2"
+}
+
 variable "application_port" {
   description = "애플리케이션 포트"
   type        = number
@@ -77,6 +83,44 @@ variable "web_ami_id" {
 
 variable "bastion_ami_id" {
   description = "AMI ID for bastion host (optional)"
+  type        = string
+  default     = null
+}
+
+
+# variable "service_bucket" {}
+# variable "service_key" { default = "music1.jar"}   
+
+
+# GitHub 비공개 릴리스 정보
+variable "gh_org" { 
+  type = string
+  default = "hty03"
+}          
+
+variable "gh_repo"      { 
+  type = string
+  default = "spring-music-server-sh"
+}     
+variable "gh_tag"      { 
+  type = string
+  default = "v1.0.0"
+
+}     
+
+variable "gh_asset" { 
+  type = string
+  default = "music1-0.0.1-SNAPSHOT.jar" 
+}        
+
+# SSM SecureString 위치(여기에 PAT 저장)
+variable "ssm_github_token_param" {
+  type        = string
+  default     = "/github/token"
+}
+
+variable "instance_profile_name" {
+  description = "재사용할 EC2 Instance Profile 이름(없으면 null)"
   type        = string
   default     = null
 }

@@ -140,3 +140,10 @@ variable "enable" {
   type        = bool
   default     = true
 }
+
+
+variable "peer_vpc_id" {
+  description = "peering vpc(SIEM-VPC) id"
+  type        = string
+  default     = "vpc-006679b6eaf98ec1a"
+}

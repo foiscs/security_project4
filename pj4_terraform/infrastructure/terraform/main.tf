@@ -14,11 +14,14 @@ module "ec2"{
   vpc_id              = module.vpc.vpc_id
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
-  # ami_id            = data.aws_ami.web.id
-  web_ami_id          = var.web_ami_id
+  web_ami_id          = var.web_ami_id  # 서울 리전에 변환된 커스텀 AMI 사용
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
+  gh_org   = "hty03"
+  gh_repo  = "spring-music-server-sh"
+  gh_tag   = "v0.0.1"
+  gh_asset = "music1-0.0.1-SNAPSHOT.jar"
 }
 
 
@@ -160,7 +163,31 @@ module "rds" {
 
 }
 
+# =========================================
+# S3 Module - for service
+# =========================================
 
+module "s3" {
+  source = "./modules/s3"
+
+  # 필수
+  project_name = var.project_name          # 예: "dev-app"
+  environment  = var.environment           # 예: "dev" | "staging" | "prod"
+
+  # 권장 기본값들
+  force_destroy       = false              # 운영용이면 false 권장
+  create_kms_key      = true               # 모듈이 KMS Key & Alias 생성
+  enable_versioning   = true
+  log_retention_days  = 365                # ISMS-P 최소 365
+  transition_to_ia_days           = 30
+  transition_to_glacier_days      = 90
+  transition_to_deep_archive_days = 180
+
+  # 태그
+  common_tags = merge(var.common_tags, {
+    Component = "S3"
+  })
+}
 
 
 # =========================================

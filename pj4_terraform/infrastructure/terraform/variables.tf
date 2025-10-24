@@ -910,9 +910,21 @@ variable "application_port" {
 }
 
 
-# 소스 AMI ID 입력 
+# 소스 AMI ID 입력 (OVA에서 변환된 서울 리전의 커스텀 AMI)
 variable "web_ami_id" {
   type        = string
-  default     = "ami-0f611aeb49e43b025"
+  default     = "ami-0e9c46d6a4ead333d"
   description = "Custom AMI converted from OVA in Seoul region"
 }
+
+
+# 서비스 올릴 s3
+# variable "service_bucket" {
+#   description = "S3 버킷 '이름' ARN x."
+#   type        = string
+# }
+
+# variable "service_key" {
+#   description = "S3 객체 키(예: practice/myapp-old-0.0.1.jar). 앞에 / 붙이지 않음."
+#   type        = string
+# }
