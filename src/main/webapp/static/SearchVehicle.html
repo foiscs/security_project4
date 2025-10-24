@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>가용 차량 검색(지점명 + 필터)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { font-family: "Segoe UI", sans-serif; background:#f8f9fc; margin:0; padding:30px; }
+        h1 { color:#222; margin-top:0; }
+        .card { background:#fff; padding:20px; margin-bottom:18px; border-radius:12px; box-shadow:0 3px 12px rgba(0,0,0,.08); }
+        label { display:block; margin:10px 0 6px; font-weight:600; color:#333; }
+        input, select { width:100%; padding:10px; border:1px solid #d9dbe0; border-radius:8px; font-size:14px; }
+        button { background:#0069ff; color:#fff; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; margin-top:12px; }
+        button:hover { background:#0053cc; }
+        table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; border-radius:10px; overflow:hidden; }
+        th, td { padding:10px 12px; border-bottom:1px solid #eef0f4; text-align:left; font-size:14px; }
+        th { background:#f0f2f6; font-weight:700; }
+        .muted { color:#6b7280; font-size:13px; }
+        .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+        .grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+        @media (max-width: 860px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<h1>🚗 차량 검색</h1>
+
+<!-- 1) 지점명으로 location_id 찾기 -->
+<div class="card">
+    <h3>① 지점 선택</h3>
+    <div class="grid-2">
+        <div>
+            <label for="locationName">지점명</label>
+            <input list="locHints" id="locationName" placeholder="예: 강남, 서울역, 판교" />
+            <datalist id="locHints"></datalist>
+        </div>
+        <div>
+            <label for="locationSelect">검색된 지점</label>
+            <select id="locationSelect">
+                <option value="">지점명을 입력하고 ‘지점 검색’ 버튼을 누르세요</option>
+            </select>
+        </div>
+    </div>
+    <div class="muted" id="locInfo"></div>
+    <button id="btnFindLocations">지점 검색</button>
+</div>
+
+<!-- 2) 기간 + 차량 필터 -->
+<div class="card">
+    <h3>② 기간 및 차량 조건</h3>
+    <div class="grid-2">
+        <div>
+            <label for="availableFrom">대여 시작</label>
+            <input id="availableFrom" type="datetime-local" />
+        </div>
+        <div>
+            <label for="availableTo">대여 종료</label>
+            <input id="availableTo" type="datetime-local" />
+        </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:8px;">
+        <div>
+            <label for="brand">브랜드</label>
+            <input id="brand" placeholder="예: Hyundai, Kia…" />
+        </div>
+        <div>
+            <label for="model">모델</label>
+            <input id="model" placeholder="예: Avante, K5…" />
+        </div>
+        <div>
+            <label for="year">연식</label>
+            <input id="year" type="number" min="1990" step="1" placeholder="예: 2022" />
+        </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:8px;">
+        <div>
+            <label for="status">가능여부</label>
+            <select id="status">
+                <option value="">전체</option>
+                <option value="available" selected>대여 가능만</option>
+                <option value="unavailable">불가(재고없음)</option>
+            </select>
+        </div>
+    </div>
+
+    <button id="btnSearchVehicles">차량 검색</button>
+</div>
+
+<!-- 3) 결과 -->
+<div class="card" id="resultCard" style="display:none;">
+    <h3>③ 검색 결과</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>브랜드</th>
+            <th>모델</th>
+            <th>연식</th>
+            <th>번호판</th>
+            <th>가능 여부</th>
+            <th>VIN</th>
+        </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table>
+</div>
+
+<script>
+    const $ = (id) => document.getElementById(id);
+
+    // local datetime → ISO-8601 (UTC Z) 변환
+    function toUTC(dtLocal) {
+      if (!dtLocal) return "";
+      const local = new Date(dtLocal);
+      return new Date(local.getTime() - local.getTimezoneOffset() * 60000).toISOString();
+    }
+
+    // 기본값: 현재+1시간 ~ +3시간
+    (function initDateTimeDefaults(){
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2,'0');
+      const toLocal = (d)=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const from = new Date(now.getTime() + 60*60*1000);
+      const to   = new Date(now.getTime() + 3*60*60*1000);
+      if (!$("availableFrom").value) $("availableFrom").value = toLocal(from);
+      if (!$("availableTo").value)   $("availableTo").value   = toLocal(to);
+    })();
+
+    // ① 지점명으로 검색
+    $("btnFindLocations").addEventListener("click", async () => {
+      const name = $("locationName").value.trim();
+      if (!name) { alert("지점명을 입력하세요."); return; }
+
+      const url = `/spring4shell-test-1.0/api/v1/locations?name=${encodeURIComponent(name)}`;
+      const res = await fetch(url);
+      if (!res.ok) { alert("지점 검색 실패 (" + res.status + ")"); return; }
+
+      const locations = await res.json();
+      const select = $("locationSelect");
+      const hints  = $("locHints");
+      select.innerHTML = "";
+      hints.innerHTML = "";
+
+      if (!locations || locations.length === 0) {
+        select.innerHTML = `<option value="">검색 결과 없음</option>`;
+        $("locInfo").textContent = "";
+        return;
+      }
+
+      locations.forEach(loc => {
+        const opt = document.createElement("option");
+        const id = loc.location_id ?? loc.locationId;
+        opt.value = id;
+        opt.textContent = `${loc.name} (${loc.type})`;
+        select.appendChild(opt);
+
+        const hint = document.createElement("option");
+        hint.value = loc.name;
+        hints.appendChild(hint);
+      });
+
+      // ★ 첫 지점 자동 선택 (중요!)
+      const first = locations[0];
+      const firstId = first.location_id ?? first.locationId;
+      $("locationSelect").value = firstId;
+      $("locInfo").textContent  = `선택된 지점: ${first.name} (id=${firstId})`;
+    });
+
+    // 지점 셀렉트 변경 시 표시
+    $("locationSelect").addEventListener("change", (e) => {
+      const text = e.target.options[e.target.selectedIndex]?.textContent || "";
+      $("locInfo").textContent = text ? `선택된 지점: ${text}` : "";
+    });
+
+    // ② 차량 검색(클라이언트 필터 포함)
+    $("btnSearchVehicles").addEventListener("click", async () => {
+      const locId   = $("locationSelect").value;
+      const fromIso = toUTC($("availableFrom").value);
+      const toIso   = toUTC($("availableTo").value);
+
+      if (!locId) { alert("지점을 먼저 선택하세요."); return; }
+      if (!fromIso || !toIso) { alert("대여 시작/종료 시간을 입력하세요."); return; }
+
+      const url = `/spring4shell-test-1.0/api/v1/vehicles?available_from=${encodeURIComponent(fromIso)}&available_to=${encodeURIComponent(toIso)}&pickup_location_id=${encodeURIComponent(locId)}`;
+      const res = await fetch(url);
+      if (!res.ok) { alert("차량 검색 실패 (" + res.status + ")"); return; }
+
+      const raw = await res.json();
+      // ★ 배열 또는 Page 모두 지원
+      let list = Array.isArray(raw) ? raw : (raw.content || []);
+
+      // ---- 클라이언트 사이드 필터 ----
+      const brand  = $("brand").value.trim().toLowerCase();
+      const model  = $("model").value.trim().toLowerCase();
+      const year   = $("year").value.trim();
+      const status = $("status").value;
+
+      list = (list || []).filter(v => {
+        const vBrand  = (v.brand ?? "").toLowerCase();
+        const vModel  = (v.model ?? "").toLowerCase();
+        const vYear   = String(v.year ?? v.yearValue ?? "");
+        const vStatus = (v.status ?? "").toLowerCase();
+
+        if (brand && !vBrand.includes(brand)) return false;
+        if (model && !vModel.includes(model)) return false;
+        if (year && vYear !== year) return false;
+        if (status === "available"   && vStatus !== "available") return false;
+        if (status === "unavailable" && vStatus === "available") return false;
+        return true;
+      });
+      // --------------------------------
+
+      const tbody = $("tbody");
+      tbody.innerHTML = "";
+
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#888;">검색 결과가 없습니다.</td></tr>`;
+        $("resultCard").style.display = "block";
+        return;
+      }
+
+      list.forEach(v => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${v.brand ?? ""}</td>
+          <td>${v.model ?? ""}</td>
+          <td>${v.year ?? v.yearValue ?? ""}</td>
+          <td>${v.plate ?? ""}</td>
+          <td>${v.status ?? ""}</td>
+          <td>${v.vin ?? ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      $("resultCard").style.display = "block";
+    });
+</script>
+</body>
+</html>

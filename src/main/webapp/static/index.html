@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Car Service API Test Console</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h2 { color: #0066cc; margin-top: 0; }
+        h3 { margin-bottom: 8px; }
+        input, button, textarea { margin: 5px; padding: 8px; }
+        input { width: 260px; }
+        .wide { width: 360px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 6px; white-space: pre-wrap; }
+        .card { border: 1px solid #e6e6e6; border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .muted { color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+<h2>🚗 Car Service API Test Console</h2>
+
+<!-- 사용자 API -->
+<div class="card">
+    <h3>회원가입</h3>
+    <div class="row">
+        <input id="email" placeholder="email@example.com" />
+        <input id="password" placeholder="password" />
+        <input id="name" placeholder="name" />
+        <input id="phone" placeholder="phone" />
+        <button onclick="createUser()">등록</button>
+    </div>
+</div>
+
+<div class="card">
+    <h3>조회</h3>
+    <div class="row">
+        <input id="userId" class="wide" placeholder="user_id (UUID)" />
+        <button onclick="getById()">ID로 조회</button>
+    </div>
+    <div class="row">
+        <input id="searchEmail" class="wide" placeholder="email@example.com" />
+        <button onclick="getByEmail()">이메일로 조회</button>
+    </div>
+</div>
+
+<div class="card">
+    <h3>부분 수정</h3>
+    <div class="row">
+        <input id="patchId" class="wide" placeholder="user_id (UUID)" />
+        <input id="patchPhone" placeholder="새 phone" />
+        <input id="patchStatus" placeholder="새 status" />
+        <button onclick="updateUser()">수정</button>
+    </div>
+</div>
+
+<!-- 차량 문 제어 추가 섹션 -->
+<div class="card">
+    <h3>🚘 차량 문 제어</h3>
+    <div class="row">
+        <input id="doorVehicleId" class="wide" placeholder="vehicle_id (UUID)" />
+        <button onclick="getDoorStatus()">상태조회</button>
+        <button onclick="openDoor()">문 열기</button>
+        <button onclick="closeDoor()">문 닫기</button>
+    </div>
+    <div class="muted">엔드포인트: <code>/api/v1/vehicles/{vehicle_id}/door</code> (GET 상태조회, POST { action: "OPEN" | "CLOSE" })</div>
+    <h4>문 제어 응답</h4>
+    <pre id="doorResult">...</pre>
+</div>
+
+<h3>응답 결과</h3>
+<pre id="result">...</pre>
+
+<script>
+    // ===== User API =====
+    const BASE_USERS = "http://localhost:8080/spring4shell-test-1.0/api/v1/users";
+
+    function showResult(elId, res, text) {
+      const header = `${res.status} ${res.statusText}`;
+      try {
+        const maybeJson = JSON.parse(text);
+        document.getElementById(elId).textContent =
+          `${header}\n` + JSON.stringify(maybeJson, null, 2);
+      } catch(_) {
+        document.getElementById(elId).textContent = `${header}\n${text || "(빈 응답)"}`;
+      }
+    }
+
+    async function createUser() {
+      const body = {
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value,
+        name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim()
+      };
+      try {
+        const res = await fetch(BASE_USERS, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          credentials: "same-origin"
+        });
+        showResult("result", res, await res.text());
+      } catch (e) {
+        document.getElementById("result").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    async function getById() {
+      const id = document.getElementById("userId").value.trim();
+      if (!id) { alert("user_id를 입력하세요"); return; }
+      try {
+        const res = await fetch(`${BASE_USERS}/${encodeURIComponent(id)}`, { credentials: "same-origin" });
+        showResult("result", res, await res.text());
+      } catch (e) {
+        document.getElementById("result").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    async function getByEmail() {
+      const email = document.getElementById("searchEmail").value.trim();
+      if (!email) { alert("email을 입력하세요"); return; }
+      try {
+        const res = await fetch(`${BASE_USERS}?email=${encodeURIComponent(email)}`, { credentials: "same-origin" });
+        showResult("result", res, await res.text());
+      } catch (e) {
+        document.getElementById("result").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    async function updateUser() {
+      const id = document.getElementById("patchId").value.trim();
+      if (!id) { alert("user_id를 입력하세요"); return; }
+      const body = {
+        phone: document.getElementById("patchPhone").value.trim() || undefined,
+        status: document.getElementById("patchStatus").value.trim() || undefined
+      };
+      try {
+        const res = await fetch(`${BASE_USERS}/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          credentials: "same-origin"
+        });
+        showResult("result", res, await res.text());
+      } catch (e) {
+        document.getElementById("result").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    // ===== Vehicle Door Control =====
+    const doorBase = (vid) => `http://localhost:8080/spring4shell-test-1.0/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
+
+    async function getDoorStatus() {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      try {
+        const res = await fetch(doorBase(vid), { credentials: "same-origin" });
+        showResult("doorResult", res, await res.text());
+      } catch (e) {
+        document.getElementById("doorResult").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    async function sendDoorCmd(open) {
+      const vid = document.getElementById("doorVehicleId").value.trim();
+      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
+      try {
+        const res = await fetch(doorBase(vid), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: open ? "OPEN" : "CLOSE" }),
+          credentials: "same-origin"
+        });
+        showResult("doorResult", res, await res.text());
+        if (res.ok) { await getDoorStatus(); } // 성공 시 상태 갱신
+      } catch (e) {
+        document.getElementById("doorResult").textContent = `ERROR\n${e}`;
+      }
+    }
+
+    function openDoor()  { sendDoorCmd(true); }
+    function closeDoor() { sendDoorCmd(false); }
+</script>
+</body>
+</html>
