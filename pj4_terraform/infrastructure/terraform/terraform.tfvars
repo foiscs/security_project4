@@ -11,4 +11,4 @@ environment        = "dev"
 project_name       = "dev-app"
 enable_load_balancer = true
 application_port     = 8080
-web_ami_id = "ami-0e9c46d6a4ead333d" 
+web_ami_id = "ami-073b2e8f97b4da8bd" 

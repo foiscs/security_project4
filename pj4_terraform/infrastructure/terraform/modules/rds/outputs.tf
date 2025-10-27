@@ -86,212 +86,93 @@ output "db_instance_port" {
 
 
 output "database_name" {
-
-
   description = "데이터베이스 이름"
-
-
   value       = aws_db_instance.main.db_name
-
-
 }
-
-
-
 
 
 output "master_username" {
-
-
   description = "마스터 사용자 이름"
-
-
   value       = aws_db_instance.main.username
-
-
 }
-
-
 
 
 
 # 읽기 전용 복제본 정보
-
-
 output "replica_instance_id" {
-
-
   description = "읽기 전용 복제본 인스턴스 ID"
-
-
   value       = var.create_read_replica ? aws_db_instance.replica[0].id : null
-
-
 }
-
-
-
-
 
 output "replica_instance_endpoint" {
-
-
   description = "읽기 전용 복제본 엔드포인트"
-
-
   value       = var.create_read_replica ? aws_db_instance.replica[0].endpoint : null
-
-
 }
-
-
 
 
 
 # 보안 그룹 정보
-
-
 output "security_group_id" {
-
-
   description = "RDS 보안 그룹 ID"
-
-
   value       = aws_security_group.rds.id
-
-
 }
-
-
-
 
 
 output "security_group_arn" {
-
-
   description = "RDS 보안 그룹 ARN"
-
-
   value       = aws_security_group.rds.arn
-
-
 }
-
-
-
 
 
 # 서브넷 그룹 정보
-
-
 output "db_subnet_group_name" {
-
-
   description = "DB 서브넷 그룹 이름"
-
-
   value       = aws_db_subnet_group.main.name
-
-
 }
-
-
 
 
 
 output "db_subnet_group_arn" {
-
-
   description = "DB 서브넷 그룹 ARN"
-
-
   value       = aws_db_subnet_group.main.arn
-
-
 }
-
-
-
 
 
 # 파라미터 그룹 정보
-
-
 output "parameter_group_name" {
-
-
   description = "DB 파라미터 그룹 이름"
-
-
   value       = aws_db_parameter_group.main.name
-
-
 }
-
-
 
 
 
 output "parameter_group_arn" {
-
-
   description = "DB 파라미터 그룹 ARN"
-
-
   value       = aws_db_parameter_group.main.arn
-
-
 }
-
-
 
 
 
 # 옵션 그룹 정보
-
-
 output "option_group_name" {
-
-
   description = "DB 옵션 그룹 이름"
-
-
   value       = var.create_option_group ? aws_db_option_group.main[0].name : null
-
-
 }
-
-
 
 
 
 output "option_group_arn" {
-
-
   description = "DB 옵션 그룹 ARN"
-
-
   value       = var.create_option_group ? aws_db_option_group.main[0].arn : null
-
-
 }
-
 
 
 
 
 # KMS 키 정보
-
-
 output "kms_key_id" {
-
-
   description = "RDS 암호화 KMS 키 ID"
-
-
   value       = var.create_kms_key ? aws_kms_key.rds[0].key_id : var.kms_key_id
-
-
 }
 
 

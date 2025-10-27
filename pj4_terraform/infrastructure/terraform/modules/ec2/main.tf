@@ -1,28 +1,36 @@
 # infrastructure/terraform/modules/ec2/main.tf
 
+# =========================================
+# web EC2
+# =========================================
 
-# Launch Template for web ASG
+data "aws_key_pair" "web" {
+  key_name = var.key_name   
+}
+
+# Launch Template for web
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
   image_id      = var.web_ami_id
   instance_type = "t3.micro"
   update_default_version = true 
   vpc_security_group_ids = [aws_security_group.web.id]
+  
 
   # 인스턴스 프로파일 추가
   iam_instance_profile { name = aws_iam_instance_profile.web.name }
 
   # User data(base64 인코딩 필수)
-  user_data = base64encode(templatefile("${path.module}/user_data_web.sh", {
-    app       = var.project_name
-    port      = var.application_port
-    region    = var.aws_region
-    gh_org    = var.gh_org
-    gh_repo   = var.gh_repo
-    gh_tag    = var.gh_tag
-    gh_asset  = var.gh_asset
-    ssm_param = var.ssm_github_token_param
-  }))
+#   user_data = base64encode(templatefile("${path.module}/user_data_web.sh", {
+#    app       = var.project_name
+#     port      = var.application_port
+#     region    = var.aws_region
+#     gh_org    = var.gh_org
+#     gh_repo   = var.gh_repo
+#     gh_tag    = var.gh_tag
+#     gh_asset  = var.gh_asset
+#     ssm_param = var.ssm_github_token_param
+#   }))
 
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
@@ -41,80 +49,16 @@ resource "aws_launch_template" "web" {
   }
 }
 
-# Auto Scaling Group for web (ALB에 연결)
-resource "aws_autoscaling_group" "web" {        
-  name                      = "${var.project_name}-web-asg"
-  max_size                  = 3
-  min_size                  = 1
-  desired_capacity          = 2
-  vpc_zone_identifier       = var.private_subnet_ids
+resource "aws_instance" "web" {
+  count                  = var.web_count
   launch_template {
     id      = aws_launch_template.web.id
-    version = aws_launch_template.web.latest_version
+    version = "$Latest"
   }
-  instance_refresh {
-    strategy  = "Rolling"
-    triggers  = ["launch_template"]
-  }
-  target_group_arns = [aws_lb_target_group.web.arn] 
-  tag {
-    key                 = "launch_version"
-    value               = "aws_launch_template.web.latest_version"
-    propagate_at_launch = true
-  }
-  dynamic "tag" {
-    for_each = [for k, v in var.common_tags : { key = k, value = v }]
-    content {
-      key                 = tag.value.key
-      value               = tag.value.value
-      propagate_at_launch = true
-    }
-  }
+  subnet_id     = var.private_subnet_ids[count.index % length(var.private_subnet_ids)]
+  key_name               = data.aws_key_pair.web.key_name
+  tags = merge(var.common_tags, { Name = "${var.project_name}-web-${count.index + 1}" })
 }
-
-
-# 내부용 보안그룹 (관리자/IoT)
-# resource "aws_security_group" "internal" {
-#  name_prefix = "${var.project_name}-internal-sg"
-# description = "Internal servers (admin, iot)"
-#  vpc_id      = var.vpc_id
-#  ingress {
-#    from_port   = 22
-#    to_port     = 22
-#    protocol    = "tcp"
-#    cidr_blocks = var.allowed_ssh_cidrs
-#    description = "SSH from allowed CIDRs"
-#  }
-
-#  egress {
-#    from_port   = 0
-#    to_port     = 0
-#    protocol    = "-1"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#  tags = var.common_tags
-#}
-
-# 관리자와 IoT용 개별 EC2 인스턴스 (각각 private subnet에 생성)
-# resource "aws_instance" "admin" {
-#   ami                    = var.ami_id
-#   instance_type          = "t3.micro"
-#   subnet_id              = element(var.private_subnet_ids, 0)
-#   vpc_security_group_ids = [aws_security_group.internal.id]
-#   tags = merge(var.common_tags, { Name = "${var.project_name}-admin" })
-# }
-
-
-
-
-
-#resource "aws_instance" "iot" {
-#  ami                    = var.ami_id
-#  instance_type          = "t2.micro"
-#  subnet_id              = element(var.private_subnet_ids, 0)
-#  vpc_security_group_ids = [aws_security_group.internal.id]
-#  tags = merge(var.common_tags, { Name = "${var.project_name}-iot" })
-#}
 
 # =========================================
 # Bastion Host Security Group (RDS 접근용)
@@ -277,6 +221,13 @@ resource "aws_lb_listener" "web" {
   })
 }
 
+
+resource "aws_lb_target_group_attachment" "web" {
+  count            = var.web_count
+  target_group_arn = aws_lb_target_group.web.arn
+  target_id        = aws_instance.web[count.index].id
+  port             = 8080
+}
 
 # === EC2가 SSM SecureString을 읽기 위한 최소 IAM 구성 ===
 data "aws_caller_identity" "cur" {}

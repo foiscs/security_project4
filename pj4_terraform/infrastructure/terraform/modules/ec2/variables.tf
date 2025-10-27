@@ -37,6 +37,18 @@ variable "health_check_path" {
   default     = "/"
 }
 
+variable "web_count" { 
+  description = "웹 ec2 개수"
+  type = number
+  default = 2 
+}
+
+variable "key_name" {
+  description = "key pair"
+  type        = string
+  default     = "ty-bastionec2key"
+}
+
 variable "allowed_ssh_cidrs" {
   description = "SSH 접근을 허용할 CIDR 블록들"
   type        = list(string)
@@ -73,8 +85,6 @@ variable "common_tags" {
 variable "vpc_id"               { type = string }
 variable "public_subnet_ids"    { type = list(string) }
 variable "private_subnet_ids"   { type = list(string) }
-# variable "ami_id"               { type = string }
-
 
 variable "web_ami_id" {
   description = "AMI ID for web instances (ASG)"
@@ -88,30 +98,6 @@ variable "bastion_ami_id" {
 }
 
 
-# variable "service_bucket" {}
-# variable "service_key" { default = "music1.jar"}   
-
-
-# GitHub 비공개 릴리스 정보
-variable "gh_org" { 
-  type = string
-  default = "hty03"
-}          
-
-variable "gh_repo"      { 
-  type = string
-  default = "spring-music-server-sh"
-}     
-variable "gh_tag"      { 
-  type = string
-  default = "v1.0.0"
-
-}     
-
-variable "gh_asset" { 
-  type = string
-  default = "music1-0.0.1-SNAPSHOT.jar" 
-}        
 
 # SSM SecureString 위치(여기에 PAT 저장)
 variable "ssm_github_token_param" {
@@ -136,6 +122,8 @@ variable "service_bucket_kms_arn" {
   description = "s3 kms arn (ec2에 접근 권한 주기 위해)"
   type        = string
   default     = "arn:aws:kms:ap-northeast-2:253157413163:key/6b08cc4b-1d12-43b7-abbb-d4fe2db6b49f"
+}
+
 # RDS 연결 정보
 variable "rds_endpoint" {
   description = "RDS endpoint address"
@@ -161,3 +149,5 @@ variable "rds_password" {
   sensitive   = true
   default     = ""
 }
+
+

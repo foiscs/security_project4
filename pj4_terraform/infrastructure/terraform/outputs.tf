@@ -309,13 +309,6 @@ output "security_checklist" {
 
 
 
-# =========================================
-# 웹 AutoScaling 정보
-# =========================================
-output "web_autoscaling" {
-  description = "웹 AutoScaling 정보"
-  value       = module.ec2.web_autoscaling
-}
 
 # =========================================
 # 추가 출력 정보
