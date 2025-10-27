@@ -80,3 +80,29 @@ variable "bastion_ami_id" {
   type        = string
   default     = null
 }
+
+# RDS 연결 정보
+variable "rds_endpoint" {
+  description = "RDS endpoint address"
+  type        = string
+  default     = ""
+}
+
+variable "rds_database_name" {
+  description = "RDS database name"
+  type        = string
+  default     = ""
+}
+
+variable "rds_username" {
+  description = "RDS master username"
+  type        = string
+  default     = ""
+}
+
+variable "rds_password" {
+  description = "RDS master password"
+  type        = string
+  sensitive   = true
+  default     = ""
+}

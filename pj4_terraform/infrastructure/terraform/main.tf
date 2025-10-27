@@ -16,9 +16,18 @@ module "ec2"{
   private_subnet_ids  = module.vpc.private_subnet_ids
   # ami_id            = data.aws_ami.web.id
   web_ami_id          = var.web_ami_id
+
+  # RDS 연결 정보
+  rds_endpoint        = module.rds.db_instance_address
+  rds_database_name   = module.rds.database_name
+  rds_username        = module.rds.master_username
+  rds_password        = var.db_password
+
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
+
+  depends_on = [module.rds]
 }
 
 
