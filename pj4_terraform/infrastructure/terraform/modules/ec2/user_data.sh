@@ -1,5 +1,7 @@
 #!/bin/bash
 # EC2 User Data Script for RDS Environment Variables
+snap install amazon-ssm-agent --classic
+systemctl enable --now snap.amazon-ssm-agent.amazon-ssm-agent.service
 
 # Create setenv.sh for Tomcat
 cat <<'EOF' > /opt/tomcat/bin/setenv.sh

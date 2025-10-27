@@ -34,7 +34,7 @@ variable "application_port" {
 variable "health_check_path" {
   description = "헬스 체크 경로"
   type        = string
-  default     = "/"
+  default     = "/spring4shell-test-1.0/"
 }
 
 variable "web_count" { 
