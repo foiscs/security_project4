@@ -1,0 +1,60 @@
+package com.security.test.service;
+
+import com.security.test.exception.NotFoundException;
+import com.security.test.repository.VehicleRepository;
+import com.security.test.model.dto.DoorStatusResponse;
+import org.springframework.stereotype.Service;
+
+//import java.util.concurrent.ConcurrentHashMap;
+
+import com.security.test.model.entity.VehicleTelemetry;
+import com.security.test.repository.VehicleTelemetryRepository;
+
+import java.time.LocalDateTime;
+
+@Service
+public class DoorService {
+
+    private final VehicleRepository vehicleRepository;
+    private final VehicleTelemetryRepository telemetryRepository;
+
+    public DoorService(VehicleRepository vehicleRepository,
+                       VehicleTelemetryRepository telemetryRepository) {
+        this.vehicleRepository = vehicleRepository;
+        this.telemetryRepository = telemetryRepository;
+    }
+
+    private void ensureVehicleExists(String vehicleId) {
+        vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new NotFoundException("Vehicle not found: " + vehicleId));
+    }
+
+    // 최신 텔레메트리 한 건을 읽어 상태 반환 (없으면 기본 false)
+    public DoorStatusResponse getStatus(String vehicleId) {
+        ensureVehicleExists(vehicleId);
+        boolean open = telemetryRepository
+                .findTopByVehicleIdOrderByTsDesc(vehicleId)
+                .map(VehicleTelemetry::getDoorOpen)
+                .orElse(Boolean.FALSE);
+        return new DoorStatusResponse(vehicleId, open, open ? "열림 상태" : "닫힘 상태");
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    // 문 열기/닫기 요청 시 텔레메트리 한 건 INSERT (X -> UPDATE) (히스토리 증가 없음)
+    public DoorStatusResponse setOpen(String vehicleId, boolean open) {
+        ensureVehicleExists(vehicleId);
+        var latestOpt = telemetryRepository.findTopByVehicleIdOrderByTsDesc(vehicleId);
+        if (!latestOpt.isPresent()) {
+            // ✅ 텔레메트리 행이 없으면 제어 불가 → 404
+            throw new NotFoundException("해당 차량은 없습니다: " + vehicleId);
+        }
+        // 차량 등록 등 기능에서 Vehicle_telemetry table에도 row 생성됨을 전제로
+        var row = latestOpt.get();
+        row.setTs(java.time.LocalDateTime.now());
+        row.setDoorOpen(open);
+        // 필요 시 점화/좌표/속도/raw_payload도 세팅 가능
+        telemetryRepository.save(row);
+
+        return new DoorStatusResponse(vehicleId, open, open ? "문을 열었습니다." : "문을 닫았습니다.");
+    }
+}

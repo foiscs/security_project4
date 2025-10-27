@@ -17,13 +17,16 @@ module "ec2"{
   web_ami_id          = var.web_ami_id  # 서울 리전에 변환된 커스텀 AMI 사용
   service_bucket_arn  = module.s3.service_bucket_arn
   service_bucket_kms_arn = module.s3.kms_key_arn
+
+  # RDS 연결 정보
+  rds_endpoint        = module.rds.db_instance_address
+  rds_database_name   = module.rds.database_name
+  rds_username        = module.rds.master_username
+  rds_password        = var.db_password
+
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
-  gh_org   = "hty03"
-  gh_repo  = "spring-music-server-sh"
-  gh_tag   = "v0.0.1"
-  gh_asset = "music1-0.0.1-SNAPSHOT.jar"
 }
 
 

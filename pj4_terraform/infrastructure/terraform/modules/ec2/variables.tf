@@ -136,4 +136,28 @@ variable "service_bucket_kms_arn" {
   description = "s3 kms arn (ec2에 접근 권한 주기 위해)"
   type        = string
   default     = "arn:aws:kms:ap-northeast-2:253157413163:key/6b08cc4b-1d12-43b7-abbb-d4fe2db6b49f"
+# RDS 연결 정보
+variable "rds_endpoint" {
+  description = "RDS endpoint address"
+  type        = string
+  default     = ""
+}
+
+variable "rds_database_name" {
+  description = "RDS database name"
+  type        = string
+  default     = ""
+}
+
+variable "rds_username" {
+  description = "RDS master username"
+  type        = string
+  default     = ""
+}
+
+variable "rds_password" {
+  description = "RDS master password"
+  type        = string
+  sensitive   = true
+  default     = ""
 }

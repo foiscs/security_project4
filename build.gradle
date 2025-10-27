@@ -1,37 +1,87 @@
 plugins {
-	id 'java'
-	//패키징 타입 변경
-	id 'war'
-	id 'org.springframework.boot' version '2.6.2'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'war'
 }
 
-group = 'hyundai-4th'
-version = '0.0.1-SNAPSHOT'
+group = 'com.security.test'
+version = '1.0-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	runtimeOnly 'mysql:mysql-connector-java'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    // 취약한 Spring Framework 5.1.2 버전
+    implementation 'org.springframework:spring-webmvc:5.1.2.RELEASE'
+    implementation 'org.springframework:spring-context:5.1.2.RELEASE'
+    implementation 'org.springframework:spring-orm:5.1.2.RELEASE'
+    implementation 'org.springframework:spring-tx:5.1.2.RELEASE'
+    implementation 'org.springframework:spring-jdbc:5.1.2.RELEASE'
 
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    // Spring Data JPA
+    implementation 'org.springframework.data:spring-data-jpa:2.1.2.RELEASE'
+
+    // Spring Security
+    implementation 'org.springframework.security:spring-security-web:5.1.1.RELEASE'
+    implementation 'org.springframework.security:spring-security-config:5.1.1.RELEASE'
+
+    // Hibernate JPA 구현체
+    implementation 'org.hibernate:hibernate-core:5.3.7.Final'
+    implementation 'org.hibernate:hibernate-entitymanager:5.3.7.Final'
+
+    // MySQL Connector
+    implementation 'mysql:mysql-connector-java:8.0.13'
+
+    // Validation
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:6.0.13.Final'
+
+    // Servlet API
+    providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
+    providedCompile 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
+
+    // JSTL
+    implementation 'javax.servlet:jstl:1.2'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+    // Jackson for JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // Apache Commons
+    implementation 'org.apache.commons:commons-dbcp2:2.5.0'
+
+    // JAXB for Java 11+ (Hibernate 5.3.7 호환)
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.0.1'
+    implementation 'com.sun.xml.bind:jaxb-core:2.3.0'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.0'
+    implementation 'com.sun.activation:javax.activation:1.2.0'
+}
+
+
+war {
+    archiveBaseName = 'spring4shell-test'
+    archiveVersion = '1.0'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

