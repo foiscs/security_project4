@@ -284,10 +284,17 @@ resource "aws_route" "private_to_peer" {
   vpc_peering_connection_id  = aws_vpc_peering_connection.pcx.id
 }
 
-#  Add VPC Peering Route - peer vpc(splunk)는 terraform으로 관리하지 않으므로 콘솔에서 수동으로 splunk vpc route table에 추가 필요
-# resource "aws_route" "b_to_a" {
-#   route_table_id            = aws_vpc.peer.default_route_table_id # 현재 VPC의 라우팅 테이블 ID
-#   destination_cidr_block    = aws_vpc.main.cidr_block # 대상 VPC의 CIDR 블록
-#   vpc_peering_connection_id = aws_vpc_peering_connection.pcx.id # VPC 피어링 연결 ID
-# }
+# Add VPC Peering Route - Database Subnet to Splunk VPC
+resource "aws_route" "database_to_peer" {
+  route_table_id            = aws_route_table.database.id
+  destination_cidr_block    = data.aws_vpc.SIEM-VPC.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.pcx.id
+}
+
+# Add VPC Peering Route - Splunk VPC to This VPC (Reverse Route)
+resource "aws_route" "peer_to_main" {
+  route_table_id            = "rtb-0b07c024d61bc9d50"  # Splunk VPC Route Table ID
+  destination_cidr_block    = var.vpc_cidr  # This VPC CIDR (10.0.0.0/16)
+  vpc_peering_connection_id = aws_vpc_peering_connection.pcx.id
+}
 
