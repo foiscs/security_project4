@@ -37,11 +37,19 @@ variable "health_check_path" {
   default     = "/"
 }
 
+variable "web_count" { 
+  description = "웹 ec2 개수"
+  type = number
+  default = 2 
+}
+
+
 variable "allowed_ssh_cidrs" {
   description = "SSH 접근을 허용할 CIDR 블록들"
   type        = list(string)
   default     = ["10.0.0.0/16"]  # VPC 내부만 허용
 }
+
 
 
 variable "enable_load_balancer" {
@@ -59,6 +67,7 @@ variable "lb_type" {
     error_message = "Load balancer type must be application or network."
   }
 }
+
 variable "common_tags" {
   description = "모든 리소스에 적용할 공통 태그"
   type        = map(string)
@@ -73,8 +82,6 @@ variable "common_tags" {
 variable "vpc_id"               { type = string }
 variable "public_subnet_ids"    { type = list(string) }
 variable "private_subnet_ids"   { type = list(string) }
-# variable "ami_id"               { type = string }
-
 
 variable "web_ami_id" {
   description = "AMI ID for web instances (ASG)"
@@ -88,30 +95,13 @@ variable "bastion_ami_id" {
 }
 
 
-# variable "service_bucket" {}
-# variable "service_key" { default = "music1.jar"}   
+variable "key_name" {
+  description = "key pair"
+  type        = string
+  default     = "ty-bastionec2key"
+}
 
 
-# GitHub 비공개 릴리스 정보
-variable "gh_org" { 
-  type = string
-  default = "hty03"
-}          
-
-variable "gh_repo"      { 
-  type = string
-  default = "spring-music-server-sh"
-}     
-variable "gh_tag"      { 
-  type = string
-  default = "v1.0.0"
-
-}     
-
-variable "gh_asset" { 
-  type = string
-  default = "music1-0.0.1-SNAPSHOT.jar" 
-}        
 
 # SSM SecureString 위치(여기에 PAT 저장)
 variable "ssm_github_token_param" {

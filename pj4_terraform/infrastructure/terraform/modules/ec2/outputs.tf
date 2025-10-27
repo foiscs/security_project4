@@ -1,13 +1,6 @@
 # infrastructure/terraform/modules/ec2/outputs.tf
 
-output "web_autoscaling" {
-  description = "웹 AutoScaling 정보"
-  value = {
-    asg_name      = aws_autoscaling_group.web.name
-    target_group  = aws_lb_target_group.web.arn
-    desired_count = aws_autoscaling_group.web.desired_capacity
-  }
-}
+
 
 output "alb_configuration" {
   description = "ALB 설정 정보"

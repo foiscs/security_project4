@@ -166,7 +166,6 @@ variable "dynamodb_write_capacity" {
 
 # =========================================
 # 보안 및 모니터링 설정
-
 # =========================================
 
 variable "enable_cloudtrail" {
@@ -820,44 +819,22 @@ locals {
 
 
   current_env_config = local.environment_defaults[var.environment]
-
-
 }
-
-
 
 
 
 variable "availability_zones" {
-
-
   description = "사용할 가용 영역 목록"
-
-
   type        = list(string)
-
-
   default     = ["ap-northeast-2a", "ap-northeast-2b"]
-
-
 }
 
 
 
-
-
 variable "db_user" {
-
-
   description = "데이터베이스 사용자명"
-
-
   type        = string
-
-
-  default     = "dbadmin"
-
-
+  default     = "admin"
 }
 
 
@@ -913,7 +890,7 @@ variable "application_port" {
 # 소스 AMI ID 입력 (OVA에서 변환된 서울 리전의 커스텀 AMI)
 variable "web_ami_id" {
   type        = string
-  default     = "ami-0e9c46d6a4ead333d"
+  default     = "ami-073b2e8f97b4da8bd"
   description = "Custom AMI converted from OVA in Seoul region"
 }
 

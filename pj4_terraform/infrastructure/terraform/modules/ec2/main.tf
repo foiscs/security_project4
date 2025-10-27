@@ -1,117 +1,63 @@
 # infrastructure/terraform/modules/ec2/main.tf
 
 
-# Launch Template for web ASG
-resource "aws_launch_template" "web" {
-  name_prefix   = "${var.project_name}-web-"
-  image_id      = var.web_ami_id
-  instance_type = "t3.micro"
-  update_default_version = true 
+
+
+# =========================================
+# web EC2
+# =========================================
+
+data "aws_key_pair" "web" {
+  key_name = var.key_name   
+}
+
+resource "aws_instance" "web" {
+  count                  = var.web_count
+  ami                    = var.web_ami_id
+  instance_type          = "t3.micro"
+  subnet_id              = var.private_subnet_ids[count.index % length(var.private_subnet_ids)]
   vpc_security_group_ids = [aws_security_group.web.id]
-
-  # 인스턴스 프로파일 추가
-  iam_instance_profile { name = aws_iam_instance_profile.web.name }
-
-  # User data(base64 인코딩 필수)
-  user_data = base64encode(templatefile("${path.module}/user_data_web.sh", {
-    app       = var.project_name
-    port      = var.application_port
-    region    = var.aws_region
-    gh_org    = var.gh_org
-    gh_repo   = var.gh_repo
-    gh_tag    = var.gh_tag
-    gh_asset  = var.gh_asset
-    ssm_param = var.ssm_github_token_param
-  }))
-
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(var.common_tags, {
-      Name = "${var.project_name}-web"
-      Role = "web"
-    })
-  }
-}
-
-# Auto Scaling Group for web (ALB에 연결)
-resource "aws_autoscaling_group" "web" {        
-  name                      = "${var.project_name}-web-asg"
-  max_size                  = 3
-  min_size                  = 1
-  desired_capacity          = 2
-  vpc_zone_identifier       = var.private_subnet_ids
-  launch_template {
-    id      = aws_launch_template.web.id
-    version = aws_launch_template.web.latest_version
-  }
-  instance_refresh {
-    strategy  = "Rolling"
-    triggers  = ["launch_template"]
-  }
-  target_group_arns = [aws_lb_target_group.web.arn] 
-  tag {
-    key                 = "launch_version"
-    value               = "aws_launch_template.web.latest_version"
-    propagate_at_launch = true
-  }
-  dynamic "tag" {
-    for_each = [for k, v in var.common_tags : { key = k, value = v }]
-    content {
-      key                 = tag.value.key
-      value               = tag.value.value
-      propagate_at_launch = true
-    }
-  }
+  key_name               = data.aws_key_pair.web.key_name
+  # associate_public_ip_address = true
+  tags = merge(var.common_tags, { Name = "${var.project_name}-web-${count.index + 1}" })
 }
 
 
-# 내부용 보안그룹 (관리자/IoT)
-# resource "aws_security_group" "internal" {
-#  name_prefix = "${var.project_name}-internal-sg"
-# description = "Internal servers (admin, iot)"
-#  vpc_id      = var.vpc_id
-#  ingress {
-#    from_port   = 22
-#    to_port     = 22
-#    protocol    = "tcp"
-#    cidr_blocks = var.allowed_ssh_cidrs
-#    description = "SSH from allowed CIDRs"
-#  }
+resource "aws_security_group" "web" {
+  name_prefix = "${var.project_name}-web"
+  vpc_id      = var.vpc_id
+  description = "Security group for web host access"
 
-#  egress {
-#    from_port   = 0
-#    to_port     = 0
-#    protocol    = "-1"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#  tags = var.common_tags
-#}
+  # ALB SG를 '소스'로 해서 앱 포트만 허용
+  ingress {
+    description = "App traffic from ALB"
+    from_port   = var.application_port
+    to_port     = var.application_port
+    protocol    = "tcp"
+    security_groups = [aws_security_group.alb[0].id]
+  }
 
-# 관리자와 IoT용 개별 EC2 인스턴스 (각각 private subnet에 생성)
-# resource "aws_instance" "admin" {
-#   ami                    = var.ami_id
-#   instance_type          = "t3.micro"
-#   subnet_id              = element(var.private_subnet_ids, 0)
-#   vpc_security_group_ids = [aws_security_group.internal.id]
-#   tags = merge(var.common_tags, { Name = "${var.project_name}-admin" })
-# }
-
-
-
-
-
-#resource "aws_instance" "iot" {
-#  ami                    = var.ami_id
-#  instance_type          = "t2.micro"
-#  subnet_id              = element(var.private_subnet_ids, 0)
-#  vpc_security_group_ids = [aws_security_group.internal.id]
-#  tags = merge(var.common_tags, { Name = "${var.project_name}-iot" })
-#}
+  # 모든 outbound 트래픽 허용
+  egress {
+    description = "All outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(var.common_tags, {
+    Name      = "${var.project_name}-web-sg"
+    Component = "Security"
+  })
+}
 
 # =========================================
 # Bastion Host Security Group (RDS 접근용)
 # =========================================
+
+data "aws_key_pair" "bastion" {
+  key_name = var.key_name   # 예: "my-keypair"
+}
 
 resource "aws_security_group" "bastion" {
   name_prefix = "${var.project_name}-bastion"
@@ -122,7 +68,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_cidrs
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "All outbound traffic"
@@ -137,44 +83,24 @@ resource "aws_security_group" "bastion" {
   })
 }
 
+
+data "aws_ssm_parameter" "al2023" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+}
+
 # RDS 연결용 bastion host
 resource "aws_instance" "bastion" {
   ami                    = coalesce(var.bastion_ami_id, data.aws_ssm_parameter.al2023.value)
   instance_type          = "t3.micro"
   subnet_id              = element(var.public_subnet_ids, 0)
   vpc_security_group_ids = [aws_security_group.bastion.id]
+  key_name               = data.aws_key_pair.bastion.key_name
+  associate_public_ip_address = true
   tags = merge(var.common_tags, { Name = "${var.project_name}-bastion" })
 }
 
-data "aws_ssm_parameter" "al2023" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
-}
 
 
-resource "aws_security_group" "web" {
-  name_prefix = "${var.project_name}-web"
-  vpc_id      = var.vpc_id
-  description = "Security group for web host access"
-  # ALB SG를 '소스'로 해서 앱 포트만 허용
-  ingress {
-    description = "App traffic from ALB"
-    from_port   = var.application_port
-    to_port     = var.application_port
-    protocol    = "tcp"
-    security_groups = [aws_security_group.alb[0].id]
-  }
-  egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = merge(var.common_tags, {
-    Name      = "${var.project_name}-web-sg"
-    Component = "Security"
-  })
-}
 
 # =========================================
 # Application Load Balancer
@@ -271,6 +197,14 @@ resource "aws_lb_listener" "web" {
 }
 
 
+resource "aws_lb_target_group_attachment" "web" {
+  count               = var.web_count
+  target_group_arn    = aws_lb_target_group.web.arn
+  target_id           = aws_instance.web[count.index].id  # 인스턴스 ID로
+  port                = 8080                               # 앱 리슨 포트
+}
+
+
 # === EC2가 SSM SecureString을 읽기 위한 최소 IAM 구성 ===
 data "aws_caller_identity" "cur" {}
 
@@ -295,17 +229,8 @@ resource "aws_iam_role" "web" {
   tags               = var.common_tags
 }
 
-# /github/token 읽기 권한
-# locals {
-#   ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
-# }
 
 
-
-# SSM SecureString(/github/token 등) 읽기 (필요하면 남기고, 안쓰면 제거)
-locals {
-  ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
-}
 
 data "aws_iam_policy_document" "ssm_read" {
   statement {
@@ -332,11 +257,6 @@ resource "aws_iam_role_policy_attachment" "attach_ssm_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-
-# 최종 LT에 연결할 인스턴스 프로파일 이름
-locals {
-  resolved_instance_profile = local.create_ip ? aws_iam_instance_profile.web.name : var.instance_profile_name
-}
 
 
 # =========================================
@@ -383,8 +303,7 @@ resource "aws_iam_role_policy_attachment" "web_kms_use_attach" {
 }
 
 
-# Instance Profile (LT에 붙일 것)
-resource "aws_iam_instance_profile" "web" {
-  name = "${var.project_name}-web-profile"
-  role = aws_iam_role.web.name
+locals {
+  ssm_param_arn = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.cur.account_id}:parameter${var.ssm_github_token_param}"
 }
+

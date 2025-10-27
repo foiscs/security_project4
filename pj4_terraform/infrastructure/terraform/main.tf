@@ -20,10 +20,6 @@ module "ec2"{
   common_tags = merge(var.common_tags, {
     Component = "Networking"
   })
-  gh_org   = "hty03"
-  gh_repo  = "spring-music-server-sh"
-  gh_tag   = "v0.0.1"
-  gh_asset = "music1-0.0.1-SNAPSHOT.jar"
 }
 
 
