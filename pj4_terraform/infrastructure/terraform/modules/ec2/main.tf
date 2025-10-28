@@ -8,6 +8,10 @@ data "aws_key_pair" "web" {
   key_name = var.key_name   
 }
 
+data "aws_key_pair" "bastion" {
+  key_name = var.key_name   
+}
+
 # Launch Template for web
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
@@ -73,7 +77,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_cidrs
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "All outbound traffic"
@@ -94,6 +98,7 @@ resource "aws_instance" "bastion" {
   instance_type          = "t3.micro"
   subnet_id              = element(var.public_subnet_ids, 0)
   vpc_security_group_ids = [aws_security_group.bastion.id]
+  key_name               = data.aws_key_pair.bastion.key_name
   tags = merge(var.common_tags, { Name = "${var.project_name}-bastion" })
 }
 
