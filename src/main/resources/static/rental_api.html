@@ -1,324 +1,208 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Rental API Tester</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <style>
-        :root { --gap:12px }
-        *{box-sizing:border-box}
-        body{font-family:system-ui,Segoe UI,Apple SD Gothic Neo,Pretendard,Arial;max-width:980px;margin:24px auto;padding:0 16px}
-        h1{margin:0 0 8px}
-        h2{margin:28px 0 12px}
-        fieldset{border:1px solid #ddd;border-radius:12px;padding:16px;margin:0}
-        legend{padding:0 6px}
-        label{display:block;margin:8px 0 4px;font-size:14px}
-        input,button,textarea{padding:10px;border:1px solid #ccc;border-radius:10px}
-        input,textarea{width:100%}
-        textarea{min-height:120px;font-family:ui-monospace,SFMono-Regular,Consolas,Monaco,monospace}
-        button{cursor:pointer}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
-        .row{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-        .actions{display:flex;gap:var(--gap);flex-wrap:wrap;margin-top:12px}
-        .card{border:1px solid #eee;border-radius:12px;margin-top:12px;padding:12px;background:#fafafa}
-        .kbd{font-family:ui-monospace,monospace;background:#f1f1f1;border-radius:6px;padding:2px 6px}
-        .muted{color:#666;font-size:12px}
-        .ok{color:#0a7}
-        .err{color:#c00;white-space:pre-wrap}
-        .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:#efefef;display:inline-block;margin-left:6px}
-        .small{font-size:12px}
-        .right{display:flex;justify-content:flex-end}
-        .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-        .nowrap{white-space:nowrap}
-        .copy{padding:6px 10px;font-size:12px}
-        .spinner{display:none;margin-left:8px;border:2px solid #eee;border-top:2px solid #555;border-radius:50%;width:16px;height:16px;animation:spin 1s linear infinite}
-        .loading .spinner{display:inline-block}
-        @keyframes spin{100%{transform:rotate(360deg)}}
-        .split{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--gap)}
-        @media (max-width: 820px){ .split{grid-template-columns:1fr} .grid-2,.grid-3,.row{grid-template-columns:1fr} }
+        body { font-family: system-ui, Arial, sans-serif; max-width: 900px; margin: 30px auto; }
+        .card, fieldset { border: 1px solid #ddd; border-radius: 12px; padding: 18px; margin-bottom: 22px; }
+        label { display: block; margin: 8px 0 4px; }
+        input, button { padding: 10px; border-radius: 8px; }
+        input { width: 100%; border: 1px solid #ccc; }
+        button { cursor: pointer; }
+        .actions { margin: 14px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .muted { color: #555; }
     </style>
 </head>
 <body>
-<h1>Rental API Tester <span class="pill">/api/v1</span></h1>
+<h1>Rental API Tester <span class="muted">/api/v1</span></h1>
 <div class="card">
-    <div class="grid-3">
-        <div>
-            <label>Base URL</label>
-            <input id="baseUrl" placeholder="예: http://localhost:8080" />
-        </div>
-        <div>
-            <label>Auth Header (선택) <span class="muted">예: Bearer …</span></label>
-            <input id="auth" placeholder="Authorization 값" />
-        </div>
-        <div class="flex" style="margin-top:28px">
-            <button id="btnSaveEnv">환경 저장</button>
-            <button id="btnResetEnv">초기화</button>
-            <span class="muted">저장하면 다음 방문 시 자동 복원</span>
-        </div>
+    <label>Base URL</label>
+    <input id="baseUrl" value="http://localhost:8080" />
+    <label>Auth Header (optional) <span class="muted">e.g. Bearer ...</span></label>
+    <input id="auth" placeholder="Authorization Value" />
+    <div class="actions">
+        <button id="btnSaveEnv">Save</button>
+        <button id="btnResetEnv">Reset</button>
     </div>
 </div>
 
-<h2>대여 시작 (POST /api/v1/rentals)</h2>
-<form id="formStart" class="split">
-    <fieldset>
-        <legend>Request</legend>
-        <div class="grid-2">
-            <div>
-                <label>Reservation ID</label>
-                <input id="reservationId" required>
-            </div>
-            <div>
-                <label>User ID</label>
-                <input id="userId" required>
-            </div>
+<h2>Start Rental (POST /api/v1/rentals)</h2>
+<form id="formStart" class="card">
+    <div class="grid">
+        <div>
+            <label>Reservation ID</label>
+            <input id="reservationId" required>
         </div>
-        <div class="grid-2">
-            <div>
-                <label>Vehicle ID</label>
-                <input id="vehicleId" required>
-            </div>
-            <div>
-                <label>시작 주행거리(km)</label>
-                <input id="startMeter" type="number" required>
-            </div>
+        <div>
+            <label>User ID</label>
+            <input id="userId" required>
         </div>
-        <div class="actions">
-            <button type="button" id="btnFillStart">샘플 채우기</button>
-            <button type="submit" id="btnCallStart">요청 보내기</button>
-            <div class="spinner" id="spinStart"></div>
+        <div>
+            <label>Vehicle ID</label>
+            <input id="vehicleId" required>
         </div>
-        <div class="card small">
-            <div class="flex">
-                <span class="muted nowrap">Payload 미리보기 (읽기전용)</span>
-                <button type="button" class="copy" data-copy-target="#previewStart">복사</button>
-            </div>
-            <pre id="previewStart" class="small">{}</pre>
+        <div>
+            <label>Start Odometer (km)</label>
+            <input id="startMeter" type="number" required>
         </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>curl</legend>
-        <div class="actions right">
-            <button type="button" class="copy" data-copy-target="#curlStart">curl 복사</button>
-        </div>
-        <textarea id="curlStart" readonly></textarea>
-    </fieldset>
+    </div>
+    <div class="actions">
+        <button type="button" id="btnFillStart">Fill Sample</button>
+        <button type="submit" id="btnCallStart">Send Request</button>
+    </div>
+    <div class="card muted">
+        <span>Payload Preview (read-only)</span>
+        <pre id="previewStart">{}</pre>
+    </div>
+    <div class="card muted">
+        <span>Response</span>
+        <pre id="respStart">{}</pre>
+    </div>
 </form>
 
-<div class="card">
-    <div class="flex">
-        <strong>Response</strong>
-        <span id="metaStart" class="muted"></span>
+<h2>Return (PATCH /api/v1/rentals/{rentalId})</h2>
+<form id="formReturn" class="card">
+    <div class="grid">
+        <div>
+            <label>Rental ID</label>
+            <input id="rentalId" required>
+        </div>
+        <div>
+            <label>Return Odometer (km)</label>
+            <input id="endMeter" type="number" required>
+        </div>
     </div>
-    <pre id="respStart">{}</pre>
-</div>
-
-<h2>반납 (PATCH /api/v1/rentals/{rentalId})</h2>
-<form id="formReturn" class="split">
-    <fieldset>
-        <legend>Request</legend>
-        <div class="grid-2">
-            <div>
-                <label>Rental ID</label>
-                <input id="rentalId" required>
-            </div>
-            <div>
-                <label>반납 주행거리(km)</label>
-                <input id="endMeter" type="number" required>
-            </div>
-        </div>
-        <div class="actions">
-            <button type="button" id="btnUseLast">마지막 생성값 불러오기</button>
-            <button type="button" id="btnFillReturn">샘플 채우기</button>
-            <button type="submit" id="btnCallReturn">요청 보내기</button>
-            <div class="spinner" id="spinReturn"></div>
-        </div>
-        <div class="card small">
-            <div class="flex">
-                <span class="muted nowrap">Payload 미리보기 (읽기전용)</span>
-                <button type="button" class="copy" data-copy-target="#previewReturn">복사</button>
-            </div>
-            <pre id="previewReturn" class="small">{}</pre>
-        </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>curl</legend>
-        <div class="actions right">
-            <button type="button" class="copy" data-copy-target="#curlReturn">curl 복사</button>
-        </div>
-        <textarea id="curlReturn" readonly></textarea>
-    </fieldset>
+    <div class="actions">
+        <button type="button" id="btnUseLast">Load Last</button>
+        <button type="button" id="btnFillReturn">Fill Sample</button>
+        <button type="submit" id="btnCallReturn">Send Request</button>
+    </div>
+    <div class="card muted">
+        <span>Payload Preview (read-only)</span>
+        <pre id="previewReturn">{}</pre>
+    </div>
+    <div class="card muted">
+        <span>Response</span>
+        <pre id="respReturn">{}</pre>
+    </div>
 </form>
-
-<div class="card">
-    <div class="flex">
-        <strong>Response</strong>
-        <span id="metaReturn" class="muted"></span>
-    </div>
-    <pre id="respReturn">{}</pre>
-</div>
 
 <script>
-    const $ = sel => document.querySelector(sel);
-    const fmt = v => JSON.stringify(v, null, 2);
-    const nowMs = () => Date.now();
-
-    function saveEnv(){
-      localStorage.setItem('rental.baseUrl', $('#baseUrl').value.trim());
-      localStorage.setItem('rental.auth', $('#auth').value.trim());
+    // 기본 세팅 및 유틸
+    function nowISO() {
+      return new Date().toISOString();
     }
-    function loadEnv(){
-      $('#baseUrl').value = localStorage.getItem('rental.baseUrl') || location.origin;
-      $('#auth').value = localStorage.getItem('rental.auth') || '';
-    }
-    function setLastRentalId(id){
-      if(!id) return;
-      localStorage.setItem('rental.lastRentalId', id);
-    }
-    function getLastRentalId(){
-      return localStorage.getItem('rental.lastRentalId') || '';
-    }
-
-    function headers(){
-      const h = { 'Content-Type': 'application/json' };
-      const auth = $('#auth').value.trim();
-      if (auth) h['Authorization'] = auth;
-      return h;
-    }
-
-    function makeCurl(method, url, body){
-      const h = headers();
-      const hStr = Object.entries(h).map(([k,v])=>`-H '${k}: ${v}'`).join(' ');
-      const b = body ? `--data '${JSON.stringify(body)}'` : '';
-      return `curl -X ${method} ${hStr} '${url}' ${b}`.trim();
-    }
-
-    function setLoading(section, flag){
-      const el = section === 'start' ? $('#spinStart') : $('#spinReturn');
-      const btn = section === 'start' ? $('#btnCallStart') : $('#btnCallReturn');
-      if(flag){ el.parentElement.classList.add('loading'); btn.disabled = true; }
-      else { el.parentElement.classList.remove('loading'); btn.disabled = false; }
-    }
-
-    function safeJSON(res) {
-      return res.text().then(t => {
-        try { return [res, JSON.parse(t)] } catch { return [res, t] }
-      });
-    }
-
-    function copyFrom(targetSel){
-      const el = $(targetSel);
-      const txt = el.value !== undefined ? el.value : el.textContent;
-      navigator.clipboard.writeText(txt || '');
-    }
-
-    function updateStartPreview(){
-      const payload = {
-        reservationId: $('#reservationId').value.trim(),
-        userId: $('#userId').value.trim(),
-        vehicleId: $('#vehicleId').value.trim(),
-        startMeter: parseInt($('#startMeter').value || '0', 10),
-        startActualEpochMs: nowMs()
+    function headers() {
+      const auth = document.getElementById('auth').value.trim();
+      return {
+        "Content-Type": "application/json",
+        ...(auth && { "Authorization": auth })
       };
-      $('#previewStart').textContent = fmt(payload);
-      const url = `${$('#baseUrl').value.trim()}/api/v1/rentals`;
-      $('#curlStart').value = makeCurl('POST', url, payload);
     }
+    function fmt(v) { return JSON.stringify(v, null, 2); }
 
-    function updateReturnPreview(){
-      const rentalId = $('#rentalId').value.trim();
-      const payload = {
-        rentalId,
-        endMeter: parseInt($('#endMeter').value || '0', 10),
-        endActualEpochMs: nowMs()
-      };
-      $('#previewReturn').textContent = fmt(payload);
-      const url = `${$('#baseUrl').value.trim()}/api/v1/rentals/${encodeURIComponent(rentalId)}`;
-      $('#curlReturn').value = makeCurl('PATCH', url, payload);
-    }
+    // 환경 저장/복원
+    document.getElementById('btnSaveEnv').onclick = () => {
+      localStorage.setItem('baseUrl', document.getElementById('baseUrl').value);
+      localStorage.setItem('auth', document.getElementById('auth').value);
+    };
+    document.getElementById('btnResetEnv').onclick = () => {
+      localStorage.clear();
+      document.getElementById('baseUrl').value = 'http://localhost:8080';
+      document.getElementById('auth').value = '';
+    };
+    document.getElementById('baseUrl').value = localStorage.getItem('baseUrl') || 'http://localhost:8080';
+    document.getElementById('auth').value = localStorage.getItem('auth') || '';
 
-    $('#btnSaveEnv').addEventListener('click', saveEnv);
-    $('#btnResetEnv').addEventListener('click', () => { localStorage.clear(); loadEnv(); });
-
-    $('#btnFillStart').addEventListener('click', () => {
-      $('#reservationId').value = 'uuid-1234-RESV';
-      $('#userId').value = 'uuid-USER-0001';
-      $('#vehicleId').value = 'uuid-VEH-0001';
-      $('#startMeter').value = 12350;
+    // 샘플 채우기 (데모용 UUID)
+    document.getElementById('btnFillStart').onclick = () => {
+      document.getElementById('reservationId').value = '9b5e0a16-2e7e-4a7c-b0b0-aaaaaaaaaaaa';
+      document.getElementById('userId').value = 'e9f9f1d2-7a90-4d7c-9f4e-3a9c2fa0c0a1';
+      document.getElementById('vehicleId').value = '3a7ee4a4-3f7a-46b1-9b3e-8f9e3c4d1b2c';
+      document.getElementById('startMeter').value = 12034;
       updateStartPreview();
-    });
-
-    $('#btnUseLast').addEventListener('click', () => {
-      $('#rentalId').value = getLastRentalId();
-      updateReturnPreview();
-    });
-
-    $('#btnFillReturn').addEventListener('click', () => {
-      if(!$('#rentalId').value) $('#rentalId').value = getLastRentalId() || 'uuid-RNTL-latest';
-      $('#endMeter').value = 12580;
-      updateReturnPreview();
-    });
-
+    };
+    function updateStartPreview() {
+      const data = {
+        reservation_id: document.getElementById('reservationId').value.trim(),
+        user_id: document.getElementById('userId').value.trim(),
+        vehicle_id: document.getElementById('vehicleId').value.trim(),
+        start_actual: nowISO(),
+        start_meter: parseInt(document.getElementById('startMeter').value) || 0
+      };
+      document.getElementById('previewStart').textContent = fmt(data);
+    }
     ['reservationId','userId','vehicleId','startMeter'].forEach(id => {
-      $('#'+id).addEventListener('input', updateStartPreview);
+      document.getElementById(id).oninput = updateStartPreview;
     });
+
+    // 대여시작 요청
+    document.getElementById('formStart').onsubmit = async (e) => {
+      e.preventDefault();
+      updateStartPreview();
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      const data = JSON.parse(document.getElementById('previewStart').textContent);
+      const respBox = document.getElementById('respStart');
+      try {
+        const res = await fetch(baseUrl + '/api/v1/rentals', {
+          method: 'POST', headers: headers(), body: JSON.stringify(data)
+        });
+        const txt = await res.text();
+        respBox.textContent = txt;
+        // 성공시 rental_id 저장 (반납에 활용)
+        try {
+          const js = JSON.parse(txt);
+          if(js.rental_id)
+            localStorage.setItem('lastRentalId', js.rental_id);
+        } catch {}
+      } catch (err) {
+        respBox.textContent = String(err);
+      }
+    };
+
+    // 반납 샘플/불러오기
+    document.getElementById('btnFillReturn').onclick = () => {
+      document.getElementById('rentalId').value = localStorage.getItem('lastRentalId') || 'd50fcd70-2c59-43c4-b028-bbbbbbbbbbbb';
+      document.getElementById('endMeter').value = 12580;
+      updateReturnPreview();
+    };
+    document.getElementById('btnUseLast').onclick = () => {
+      document.getElementById('rentalId').value = localStorage.getItem('lastRentalId') || '';
+      updateReturnPreview();
+    };
+    function updateReturnPreview() {
+      const data = {
+        end_actual: nowISO(),
+        end_meter: parseInt(document.getElementById('endMeter').value) || 0
+      };
+      document.getElementById('previewReturn').textContent = fmt(data);
+    }
     ['rentalId','endMeter'].forEach(id => {
-      $('#'+id).addEventListener('input', updateReturnPreview);
+      document.getElementById(id).oninput = updateReturnPreview;
     });
 
-    document.querySelectorAll('.copy').forEach(btn=>{
-      btn.addEventListener('click', e => copyFrom(btn.dataset.copyTarget));
-    });
-
-    $('#formStart').addEventListener('submit', async (e) => {
+    // 반납 요청
+    document.getElementById('formReturn').onsubmit = async (e) => {
       e.preventDefault();
-      saveEnv();
-      setLoading('start', true);
-      const t0 = performance.now();
-      const payload = JSON.parse($('#previewStart').textContent || '{}');
-      const url = `${$('#baseUrl').value.trim()}/api/v1/rentals`;
-      try{
-        const r = await fetch(url, { method:'POST', headers: headers(), body: JSON.stringify(payload) });
-        const [res, data] = await safeJSON(r);
-        const t1 = performance.now();
-        $('#metaStart').textContent = `status ${res.status} • ${(t1 - t0).toFixed(0)} ms`;
-        $('#respStart').textContent = typeof data === 'string' ? data : fmt(data);
-        if(res.ok && data && data.rentalId){ setLastRentalId(data.rentalId); }
-      }catch(err){
-        $('#metaStart').textContent = 'network error';
-        $('#respStart').textContent = String(err);
-      }finally{
-        setLoading('start', false);
+      updateReturnPreview();
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+      const rentalId = document.getElementById('rentalId').value.trim();
+      const data = JSON.parse(document.getElementById('previewReturn').textContent);
+      const respBox = document.getElementById('respReturn');
+      try {
+        const res = await fetch(baseUrl + '/api/v1/rentals/' + encodeURIComponent(rentalId), {
+          method: 'PATCH', headers: headers(), body: JSON.stringify(data)
+        });
+        respBox.textContent = await res.text();
+      } catch (err) {
+        respBox.textContent = String(err);
       }
-    });
-
-    $('#formReturn').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      saveEnv();
-      setLoading('return', true);
-      const rentalId = $('#rentalId').value.trim();
-      const t0 = performance.now();
-      const payload = JSON.parse($('#previewReturn').textContent || '{}');
-      const url = `${$('#baseUrl').value.trim()}/api/v1/rentals/${encodeURIComponent(rentalId)}`;
-      try{
-        const r = await fetch(url, { method:'PATCH', headers: headers(), body: JSON.stringify(payload) });
-        const [res, data] = await safeJSON(r);
-        const t1 = performance.now();
-        $('#metaReturn').textContent = `status ${res.status} • ${(t1 - t0).toFixed(0)} ms`;
-        $('#respReturn').textContent = typeof data === 'string' ? data : fmt(data);
-      }catch(err){
-        $('#metaReturn').textContent = 'network error';
-        $('#respReturn').textContent = String(err);
-      }finally{
-        setLoading('return', false);
-      }
-    });
-
-    loadEnv();
-    updateStartPreview();
-    updateReturnPreview();
+    };
+    // 미리보기 자동 갱신
+    updateStartPreview(); updateReturnPreview();
 </script>
 </body>
 </html>

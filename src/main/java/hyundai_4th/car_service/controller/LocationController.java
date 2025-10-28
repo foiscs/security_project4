@@ -1,4 +1,4 @@
-package hyundai_4th.car_service.controller;
+/*package hyundai_4th.car_service.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -86,3 +86,4 @@ public class LocationController {
                 "쿼리 파라미터가 필요합니다. name=지점명 또는 near=lat,lng & radius_km=숫자");
     }
 }
+*/

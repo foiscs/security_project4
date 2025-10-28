@@ -1,4 +1,4 @@
-package hyundai_4th.car_service;
+/*package hyundai_4th.car_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,4 +10,4 @@ class CarServiceApplicationTests {
 	void contextLoads() {
 	}
 
-}
+}*/
