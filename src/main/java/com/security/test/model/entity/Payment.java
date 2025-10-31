@@ -43,6 +43,9 @@ public class Payment {
     @Column(name = "pg_tx_id", length = 128)
     private String pgTxId;
 
+    @Column(name = "pg_provider", length = 50)
+    private String pgProvider;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -142,6 +145,14 @@ public class Payment {
 
     public void setPgTxId(String pgTxId) {
         this.pgTxId = pgTxId;
+    }
+
+    public String getPgProvider() {
+        return pgProvider;
+    }
+
+    public void setPgProvider(String pgProvider) {
+        this.pgProvider = pgProvider;
     }
 
     public LocalDateTime getCreatedAt() {
