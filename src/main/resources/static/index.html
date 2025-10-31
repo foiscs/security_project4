@@ -71,8 +71,14 @@
 <pre id="result">...</pre>
 
 <script>
-    // ===== User API =====
-    const BASE_USERS = "http://localhost:8080/api/v1/users";
+    // ===== Configuration =====
+    // 상대 경로 사용 (추천)
+    const BASE_USERS = "/spring4shell-test-1.0/api/v1/users";
+    
+    // 또는 동적 설정
+    // const BASE_URL = window.location.origin;
+    // const CONTEXT_PATH = "/spring4shell-test-1.0";
+    // const BASE_USERS = `${BASE_URL}${CONTEXT_PATH}/api/v1/users`;
 
     function showResult(elId, res, text) {
       const header = `${res.status} ${res.statusText}`;
@@ -92,94 +98,118 @@
         name: document.getElementById("name").value.trim(),
         phone: document.getElementById("phone").value.trim()
       };
+      
+      // 입력 검증 추가
+      if (!body.email || !body.password || !body.name) {
+        alert("필수 항목을 입력하세요");
+        return;
+      }
+      
       try {
+        console.log("Request URL:", BASE_USERS);
+        console.log("Request Body:", body);
+        
         const res = await fetch(BASE_USERS, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
           credentials: "same-origin"
         });
-        showResult("result", res, await res.text());
+        
+        const text = await res.text();
+        showResult("result", res, text);
+        
+        if (res.ok) {
+          alert("등록 성공!");
+        }
       } catch (e) {
-        document.getElementById("result").textContent = `ERROR\n${e}`;
+        console.error("Error:", e);
+        document.getElementById("result").textContent = `ERROR\n${e.message}`;
       }
     }
 
     async function getById() {
       const id = document.getElementById("userId").value.trim();
-      if (!id) { alert("user_id를 입력하세요"); return; }
+      if (!id) { 
+        alert("user_id를 입력하세요"); 
+        return; 
+      }
+      
       try {
-        const res = await fetch(`${BASE_USERS}/${encodeURIComponent(id)}`, { credentials: "same-origin" });
-        showResult("result", res, await res.text());
+        const url = `${BASE_USERS}/${encodeURIComponent(id)}`;
+        console.log("Request URL:", url);
+        
+        const res = await fetch(url, { credentials: "same-origin" });
+        const text = await res.text();
+        showResult("result", res, text);
       } catch (e) {
-        document.getElementById("result").textContent = `ERROR\n${e}`;
+        console.error("Error:", e);
+        document.getElementById("result").textContent = `ERROR\n${e.message}`;
       }
     }
 
     async function getByEmail() {
       const email = document.getElementById("searchEmail").value.trim();
-      if (!email) { alert("email을 입력하세요"); return; }
+      if (!email) { 
+        alert("email을 입력하세요"); 
+        return; 
+      }
+      
       try {
-        const res = await fetch(`${BASE_USERS}?email=${encodeURIComponent(email)}`, { credentials: "same-origin" });
-        showResult("result", res, await res.text());
+        const url = `${BASE_USERS}?email=${encodeURIComponent(email)}`;
+        console.log("Request URL:", url);
+        
+        const res = await fetch(url, { credentials: "same-origin" });
+        const text = await res.text();
+        showResult("result", res, text);
       } catch (e) {
-        document.getElementById("result").textContent = `ERROR\n${e}`;
+        console.error("Error:", e);
+        document.getElementById("result").textContent = `ERROR\n${e.message}`;
       }
     }
 
     async function updateUser() {
       const id = document.getElementById("patchId").value.trim();
-      if (!id) { alert("user_id를 입력하세요"); return; }
-      const body = {
-        phone: document.getElementById("patchPhone").value.trim() || undefined,
-        status: document.getElementById("patchStatus").value.trim() || undefined
-      };
+      if (!id) { 
+        alert("user_id를 입력하세요"); 
+        return; 
+      }
+      
+      const body = {};
+      const phone = document.getElementById("patchPhone").value.trim();
+      const status = document.getElementById("patchStatus").value.trim();
+      
+      if (phone) body.phone = phone;
+      if (status) body.status = status;
+      
+      if (Object.keys(body).length === 0) {
+        alert("수정할 항목을 입력하세요");
+        return;
+      }
+      
       try {
-        const res = await fetch(`${BASE_USERS}/${encodeURIComponent(id)}`, {
+        const url = `${BASE_USERS}/${encodeURIComponent(id)}`;
+        console.log("Request URL:", url);
+        console.log("Request Body:", body);
+        
+        const res = await fetch(url, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
           credentials: "same-origin"
         });
-        showResult("result", res, await res.text());
+        
+        const text = await res.text();
+        showResult("result", res, text);
+        
+        if (res.ok) {
+          alert("수정 성공!");
+        }
       } catch (e) {
-        document.getElementById("result").textContent = `ERROR\n${e}`;
+        console.error("Error:", e);
+        document.getElementById("result").textContent = `ERROR\n${e.message}`;
       }
     }
-
-    // ===== Vehicle Door Control =====
-    const doorBase = (vid) => `http://localhost:8080/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
-
-    async function getDoorStatus() {
-      const vid = document.getElementById("doorVehicleId").value.trim();
-      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
-      try {
-        const res = await fetch(doorBase(vid), { credentials: "same-origin" });
-        showResult("doorResult", res, await res.text());
-      } catch (e) {
-        document.getElementById("doorResult").textContent = `ERROR\n${e}`;
-      }
-    }
-
-    async function sendDoorCmd(open) {
-      const vid = document.getElementById("doorVehicleId").value.trim();
-      if (!vid) { alert("vehicle_id를 입력하세요"); return; }
-      try {
-        const res = await fetch(doorBase(vid), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: open ? "OPEN" : "CLOSE" }),
-          credentials: "same-origin"
-        });
-        showResult("doorResult", res, await res.text());
-        if (res.ok) { await getDoorStatus(); } // 성공 시 상태 갱신
-      } catch (e) {
-        document.getElementById("doorResult").textContent = `ERROR\n${e}`;
-      }
-    }
-
-    function openDoor()  { sendDoorCmd(true); }
-    function closeDoor() { sendDoorCmd(false); }
 </script>
 </body>
 </html>

@@ -22,6 +22,12 @@ public class RentalDTO {
         private String rentalId;
         private Integer endMeter;
         private Long endActualEpochMs;
+
+        // 운행 정보 (수동 입력)
+        private Double totalDistance;      // 총 운행 거리 (km)
+        private Double averageSpeed;       // 평균 속도 (km/h)
+        private Double maxSpeed;           // 최고 속도 (km/h)
+        private String tripSummary;        // 운행 요약 정보
     }
 
     @Getter

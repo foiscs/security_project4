@@ -182,7 +182,7 @@
       if (!locId) { alert("지점을 먼저 선택하세요."); return; }
       if (!fromIso || !toIso) { alert("대여 시작/종료 시간을 입력하세요."); return; }
 
-      const url = `/spring4shell-test-1.0/api/v1/vehicles?available_from=${encodeURIComponent(fromIso)}&available_to=${encodeURIComponent(toIso)}&pickup_location_id=${encodeURIComponent(locId)}`;
+      const url = `/spring4shell-test-1.0/api/v1/vehicles/available?available_from=${encodeURIComponent(fromIso)}&available_to=${encodeURIComponent(toIso)}&pickup_location_id=${encodeURIComponent(locId)}`;
       const res = await fetch(url);
       if (!res.ok) { alert("차량 검색 실패 (" + res.status + ")"); return; }
 

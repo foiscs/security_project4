@@ -57,7 +57,7 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
      * HTTP 응답 로깅
      */
     private void logResponse(ClientHttpResponse response) throws IOException {
-        logger.info("=== RestTemplate 응답 ===");
+        logger.info("RestTemplate 응답");
         logger.info("Status Code: {}", response.getStatusCode());
         logger.info("Status Text: {}", response.getStatusText());
         logger.info("Headers: {}", response.getHeaders());

@@ -5,7 +5,9 @@ import com.security.test.model.entity.Rental;
 import com.security.test.model.entity.Reservation;
 import com.security.test.model.entity.User;
 import com.security.test.model.entity.Vehicle;
+import com.security.test.model.entity.VehicleTelemetry;
 import com.security.test.repository.RentalRepository;
+import com.security.test.repository.VehicleTelemetryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class RentalService {
 
     private final RentalRepository repo;
     private final PaymentService paymentService;
+    private final VehicleTelemetryRepository telemetryRepo;
 
     @Transactional
     public RentalDTO.RentalResponse start(RentalDTO.RentalStartRequest req) {
@@ -90,6 +93,28 @@ public class RentalService {
                 ? rental.getVehicle().getVehicleId()
                 : rental.getVehicleId(); // 편의 getter가 있으면 사용
         repo.updateVehicleStatus(vehicleId, "available");
+
+        // 운행 정보 저장 (수동 입력된 데이터를 VehicleTelemetry에 저장)
+        if (req.getTotalDistance() != null || req.getAverageSpeed() != null || req.getMaxSpeed() != null) {
+            VehicleTelemetry telemetry = new VehicleTelemetry();
+            telemetry.setVehicleId(vehicleId);
+            telemetry.setTs(rental.getEndActual() != null ? rental.getEndActual() : LocalDateTime.now());
+            telemetry.setSpeed(req.getAverageSpeed());
+            telemetry.setIgnition(false); // 반납 시점이므로 시동 꺼짐
+            telemetry.setDoorOpen(false);
+
+            // rawPayload에 운행 정보를 JSON 형태로 저장
+            String payload = String.format(
+                "{\"totalDistance\":%.2f,\"averageSpeed\":%.2f,\"maxSpeed\":%.2f,\"tripSummary\":\"%s\",\"type\":\"manual_trip_data\"}",
+                req.getTotalDistance() != null ? req.getTotalDistance() : 0.0,
+                req.getAverageSpeed() != null ? req.getAverageSpeed() : 0.0,
+                req.getMaxSpeed() != null ? req.getMaxSpeed() : 0.0,
+                req.getTripSummary() != null ? req.getTripSummary().replace("\"", "\\\"") : ""
+            );
+            telemetry.setRawPayload(payload);
+
+            telemetryRepo.save(telemetry);
+        }
 
         // 반납 완료 후 자동 결제
         paymentService.createPaymentForRental(rental);
