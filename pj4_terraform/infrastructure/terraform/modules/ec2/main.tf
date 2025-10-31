@@ -16,7 +16,7 @@ data "aws_key_pair" "bastion" {
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-"
   image_id      = var.web_ami_id
-  instance_type = "t3.small"
+  instance_type = "t3.medium"
   update_default_version = true 
   vpc_security_group_ids = [aws_security_group.web.id]
   
