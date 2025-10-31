@@ -14,20 +14,22 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * 외부 PG사 API 호출 서비스
+ * 외부 PG사 API 호출 서비스 (토스페이먼츠 스타일)
  *
  * ⚠️ 주의: 이 코드는 실제로 외부 API를 호출하지 않습니다.
- * 교육/테스트 목적으로 PG API 호출을 시뮬레이션합니다.
+ * - API URL: https://api.tosspaym3nts.com (존재하지 않는 도메인)
+ * - 교육/테스트 목적으로 PG API 호출을 시뮬레이션합니다.
+ * - 실제 토스페이먼츠 API 형식을 모방하여 HTTPS 통신을 시뮬레이션합니다.
  */
 @Service
 public class PgApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(PgApiService.class);
 
-    // 가상의 PG사 API 정보
-    private static final String PG_API_URL = "https://api.example-pg.com/v1/payments";
-    private static final String API_KEY = "test_sk_ABCdefGHIjklMNOpqrSTUvwxYZ123456";  // 임의의 API 키
-    private static final String MERCHANT_ID = "MID_hyundai_20251031";                  // 임의의 가맹점 ID
+    // 가상의 PG사 API 정보 (실제 토스페이먼츠와 유사하지만 존재하지 않는 도메인)
+    private static final String PG_API_URL = "https://api.tosspaym3nts.com/v1/paym3nts/confirm";
+    private static final String API_KEY = "test_sk_zXyW9v8u7T6s5R4q3P2o1N0m";  // 토스페이먼츠 형식의 임의 API 키
+    private static final String MERCHANT_ID = "tosspayments_hyundai_carsharing";  // 가맹점 ID
 
     @Autowired
     private RestTemplate restTemplate;
@@ -55,18 +57,19 @@ public class PgApiService {
             PgPaymentRequest request = createPaymentRequest(orderId, amount, currency,
                                                             paymentMethod, customerName, customerEmail);
 
-            // 2. HTTP 헤더 설정 (API 키 포함)
+            // 2. HTTP 헤더 설정 (토스페이먼츠 API 형식)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + API_KEY);
-            headers.set("X-Merchant-ID", MERCHANT_ID);
+            headers.set("Authorization", "Basic " + API_KEY);  // 토스페이먼츠는 Basic Auth 사용
+            headers.set("Content-Type", "application/json");
+            headers.set("User-Agent", "hyundai-carsharing/1.0");
 
             // 3. HTTP 엔티티 생성
             HttpEntity<PgPaymentRequest> entity = new HttpEntity<>(request, headers);
 
-            logger.info("요청 헤더: Authorization: Bearer {}", maskApiKey(API_KEY));
-            logger.info("요청 헤더: X-Merchant-ID: {}", MERCHANT_ID);
-            logger.info("요청 본문: {}", request);
+            logger.info("요청 헤더: Authorization: Basic {}", maskApiKey(API_KEY));
+            logger.info("요청 헤더: User-Agent: hyundai-carsharing/1.0");
+            logger.info("가맹점 ID: {}", MERCHANT_ID);
 
             // 4. 실제로는 외부 API 호출 (주석 처리)
             // ResponseEntity<PgPaymentResponse> response = restTemplate.postForEntity(
@@ -113,14 +116,14 @@ public class PgApiService {
         logger.info("취소 사유: {}", reason);
 
         try {
-            // HTTP 헤더 설정
+            // HTTP 헤더 설정 (토스페이먼츠 형식)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + API_KEY);
-            headers.set("X-Merchant-ID", MERCHANT_ID);
+            headers.set("Authorization", "Basic " + API_KEY);
+            headers.set("User-Agent", "hyundai-carsharing/1.0");
 
             // 취소 요청 URL
-            String cancelUrl = PG_API_URL + "/" + transactionId + "/cancel";
+            String cancelUrl = "https://api.tosspaym3nts.com/v1/paym3nts/" + transactionId + "/cancel";
 
             logger.info("취소 요청 URL: {}", cancelUrl);
 
