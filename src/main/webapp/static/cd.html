@@ -337,7 +337,9 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8080/spring4shell-test-1.0/api/qna';
+        // Get context path from current URL
+        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/static'));
+        const API_BASE_URL = `${window.location.origin}${contextPath}/api/qna`;
 
         // Toggle QnA form
         function toggleQnAForm() {

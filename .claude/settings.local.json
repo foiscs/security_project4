@@ -18,7 +18,9 @@
       "Bash(python3:*)",
       "Bash(powershell:*)",
       "Bash(curl -s http://192.168.0.140:8080/spring4shell-test-1.0/api/qna)",
-      "Bash(curl -s -w \"\\nHTTP Status: %{http_code}\\n\" http://192.168.0.140:8080/spring4shell-test-1.0/)"
+      "Bash(curl -s -w \"\\nHTTP Status: %{http_code}\\n\" http://192.168.0.140:8080/spring4shell-test-1.0/)",
+      "Bash(curl -s http://192.168.0.140:8080/spring4shell-test-1.0/static/cd.html)",
+      "Bash(curl -s -X POST http://192.168.0.140:8080/spring4shell-test-1.0/api/qna )"
     ],
     "deny": [],
     "ask": []

