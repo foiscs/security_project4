@@ -72,7 +72,7 @@
 
 <script>
     // ===== User API =====
-    const BASE_USERS = "http://localhost:8080/spring4shell-test-1.0/api/v1/users";
+    const BASE_USERS = "/spring4shell-test-1.0/api/v1/users";
 
     function showResult(elId, res, text) {
       const header = `${res.status} ${res.statusText}`;
@@ -148,7 +148,7 @@
     }
 
     // ===== Vehicle Door Control =====
-    const doorBase = (vid) => `http://localhost:8080/spring4shell-test-1.0/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
+    const doorBase = (vid) => `/spring4shell-test-1.0/api/v1/vehicles/${encodeURIComponent(vid)}/door`;
 
     async function getDoorStatus() {
       const vid = document.getElementById("doorVehicleId").value.trim();

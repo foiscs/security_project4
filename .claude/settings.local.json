@@ -20,7 +20,17 @@
       "Bash(curl -s http://192.168.0.140:8080/spring4shell-test-1.0/api/qna)",
       "Bash(curl -s -w \"\\nHTTP Status: %{http_code}\\n\" http://192.168.0.140:8080/spring4shell-test-1.0/)",
       "Bash(curl -s http://192.168.0.140:8080/spring4shell-test-1.0/static/cd.html)",
-      "Bash(curl -s -X POST http://192.168.0.140:8080/spring4shell-test-1.0/api/qna )"
+      "Bash(curl -s -X POST http://192.168.0.140:8080/spring4shell-test-1.0/api/qna )",
+      "Bash(curl -X POST http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/users -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"test@example.com\"\",\"\"password\"\":\"\"test1234\"\",\"\"name\"\":\"\"테스트사용자\"\",\"\"phone\"\":\"\"010-1234-5678\"\"}')",
+      "Bash(curl -X POST http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/users -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"testuser@example.com\"\",\"\"password\"\":\"\"password123\"\",\"\"name\"\":\"\"Test User\"\",\"\"phone\"\":\"\"010-1234-5678\"\"}')",
+      "Bash(curl -X POST http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"testuser@example.com\"\",\"\"password\"\":\"\"password123\"\"}')",
+      "Bash(curl -X GET http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/vehicles/available)",
+      "Bash(curl -X GET \"http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/vehicles/available?available_from=2025-11-05T10:00:00&available_until=2025-11-06T10:00:00\")",
+      "Bash(curl -X GET \"http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/vehicles/available?available_from=2025-11-05T10:00:00&available_to=2025-11-06T10:00:00\")",
+      "Bash(curl -X GET \"http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/vehicles\")",
+      "Bash(curl -X POST http://dev-app-alb-2014105529.ap-northeast-2.elb.amazonaws.com/spring4shell-test-1.0/api/v1/rentals -H \"Content-Type: application/json\" -d '{\"\"\"\"reservationId\"\"\"\":\"\"\"\"res-001\"\"\"\",\"\"\"\"userId\"\"\"\":\"\"\"\"d2026e7f-3f35-4377-919a-28cf4e2d16c1\"\"\"\",\"\"\"\"vehicleId\"\"\"\":\"\"\"\"veh-001\"\"\"\",\"\"\"\"startMileage\"\"\"\":1000}')",
+      "Bash(curl:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

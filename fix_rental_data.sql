@@ -1,0 +1,15 @@
+UPDATE rentals SET start_meter = 30000 WHERE rental_id = 'rental-test-001' AND start_meter IS NULL;
+DELETE FROM rentals WHERE rental_id = 'rental-test-001';
+DELETE FROM reservations WHERE reservation_id IN ('resv-test-001', 'resv-test-002');
+DELETE FROM vehicles WHERE vehicle_id LIKE 'veh-test-%';
+DELETE FROM locations WHERE location_id LIKE 'loc-test-%';
+INSERT INTO locations (location_id, name, lat, lng, type) VALUES ('loc-test-001', 'Test Seoul Station', 37.554260, 126.970660, 'station');
+INSERT INTO locations (location_id, name, lat, lng, type) VALUES ('loc-test-002', 'Test Gangnam Station', 37.497900, 127.027600, 'station');
+INSERT INTO vehicles (vehicle_id, vin, plate, model, brand, year, status, current_location_id) VALUES ('veh-test-001', 'VIN-TEST-00001', '99A1111', 'Sonata', 'Hyundai', 2024, 'available', 'loc-test-001');
+INSERT INTO vehicles (vehicle_id, vin, plate, model, brand, year, status, current_location_id) VALUES ('veh-test-002', 'VIN-TEST-00002', '99A2222', 'Ioniq 6', 'Hyundai', 2024, 'available', 'loc-test-001');
+INSERT INTO vehicles (vehicle_id, vin, plate, model, brand, year, status, current_location_id) VALUES ('veh-test-003', 'VIN-TEST-00003', '99A3333', 'EV6', 'Kia', 2023, 'available', 'loc-test-002');
+INSERT INTO reservations (reservation_id, user_id, vehicle_id, pickup_location_id, dropoff_location_id, start_at, end_at, status, created_at) VALUES ('resv-test-001', '31c1e869-f673-4ded-a65f-8838e54de2cc', 'veh-test-001', 'loc-test-001', 'loc-test-002', '2025-11-06 10:00:00', '2025-11-06 18:00:00', 'BOOKED', NOW());
+INSERT INTO reservations (reservation_id, user_id, vehicle_id, pickup_location_id, dropoff_location_id, start_at, end_at, status, created_at) VALUES ('resv-test-002', '31c1e869-f673-4ded-a65f-8838e54de2cc', 'veh-test-002', 'loc-test-001', 'loc-test-001', '2025-11-07 09:00:00', '2025-11-07 17:00:00', 'BOOKED', NOW());
+INSERT INTO rentals (rental_id, reservation_id, user_id, vehicle_id, start_actual, end_actual, start_meter, end_meter, status) VALUES ('rental-test-001', 'resv-test-002', '31c1e869-f673-4ded-a65f-8838e54de2cc', 'veh-test-002', '2025-11-06 09:00:00', NULL, 30000, NULL, 'ONGOING');
+UPDATE vehicles SET status = 'rented' WHERE vehicle_id = 'veh-test-002';
+UPDATE reservations SET status = 'CONVERTED' WHERE reservation_id = 'resv-test-002';
